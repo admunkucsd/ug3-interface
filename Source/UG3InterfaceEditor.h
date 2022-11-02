@@ -7,18 +7,25 @@
 
 #include <VisualizerEditorHeaders.h>
 
-namespace UG3InterfaceNode
+namespace UG3Interface
 {
-    class UG3Interface;
+    class UG3InterfaceNode;
 
-    class UG3InterfaceEditor : public GenericEditor, 
+    class UG3InterfaceEditor : public VisualizerEditor,
                               public Label::Listener,
                               public Button::Listener
     {
 
     public:
 
-        UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interface *node);
+        UG3InterfaceEditor(GenericProcessor* parentNode, UG3InterfaceNode *node);
+        
+        /** Called by the base class VisualizerEditor to display the canvas
+            when the user chooses to display one
+
+            @see VisualizerEditor::buttonClicked
+         */
+        virtual Visualizer* createNewCanvas() override;
 
         /** Button listener callback, called by button when pressed. */
         void buttonClicked(Button* button);
@@ -77,7 +84,7 @@ namespace UG3InterfaceNode
         TextButton transposeButton{ "Transpose" };
 
         // Parent node
-        UG3Interface* node;
+        UG3InterfaceNode* node;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3InterfaceEditor);
     };

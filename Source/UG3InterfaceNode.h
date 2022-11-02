@@ -10,14 +10,14 @@ const uint16_t DEFAULT_DATA_OFFSET = 32768;
 const int DEFAULT_NUM_SAMPLES = 256;
 const int DEFAULT_NUM_CHANNELS = 64;
 
-namespace UG3InterfaceNode
+namespace UG3Interface
 {
-    class UG3Interface : public DataThread, public Timer
+    class UG3InterfaceNode : public DataThread, public Timer
     {
 
     public:
-        UG3Interface(SourceNode* sn);
-        ~UG3Interface();
+        UG3InterfaceNode(SourceNode* sn);
+        ~UG3InterfaceNode();
 
         // Interface fulfillment
         bool foundInputSource() override;
@@ -51,6 +51,8 @@ namespace UG3InterfaceNode
         std::unique_ptr<GenericEditor> createEditor(SourceNode* sn);
         static DataThread* createDataThread(SourceNode* sn);
 
+        const float* getLatestValues() { return 0;}
+            
     private:
 
         bool updateBuffer() override;
@@ -71,7 +73,7 @@ namespace UG3InterfaceNode
 
         int64 currentTimestamp;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3Interface);
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3InterfaceNode);
     };
 }
 #endif

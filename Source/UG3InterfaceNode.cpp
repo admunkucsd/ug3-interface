@@ -2,18 +2,21 @@
 #include <Windows.h>
 #endif
 
-#include "UG3Interface.h"
+#include "UG3InterfaceNode.h"
+
 #include "UG3InterfaceEditor.h"
+#include "UG3InterfaceCanvas.h"
 
-using namespace UG3InterfaceNode;
 
-DataThread* UG3Interface::createDataThread(SourceNode *sn)
+using namespace UG3Interface;
+
+DataThread* UG3InterfaceNode::createDataThread(SourceNode *sn)
 {
-    return new UG3Interface(sn);
+    return new UG3InterfaceNode(sn);
 }
 
 
-UG3Interface::UG3Interface(SourceNode* sn) : DataThread(sn),
+UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     port(DEFAULT_PORT),
     num_channels(DEFAULT_NUM_CHANNELS),
     num_samp(DEFAULT_NUM_SAMPLES),
@@ -29,7 +32,7 @@ UG3Interface::UG3Interface(SourceNode* sn) : DataThread(sn),
     convbuf = (float *) malloc(num_channels * num_samp * 4);
 }
 
-std::unique_ptr<GenericEditor> UG3Interface::createEditor(SourceNode* sn)
+std::unique_ptr<GenericEditor> UG3InterfaceNode::createEditor(SourceNode* sn)
 {
 
     std::unique_ptr<UG3InterfaceEditor> editor = std::make_unique<UG3InterfaceEditor>(sn, this);
@@ -39,13 +42,13 @@ std::unique_ptr<GenericEditor> UG3Interface::createEditor(SourceNode* sn)
 
 
 
-UG3Interface::~UG3Interface()
+UG3InterfaceNode::~UG3InterfaceNode()
 {
     free(recvbuf);
     free(convbuf);
 }
 
-void UG3Interface::resizeChanSamp()
+void UG3InterfaceNode::resizeChanSamp()
 {
     sourceBuffers[0]->resize(num_channels, 10000);
     recvbuf = (uint16_t *)realloc(recvbuf, num_channels * num_samp * 2);
@@ -56,12 +59,12 @@ void UG3Interface::resizeChanSamp()
     ttlEventWords.resize(num_samp);
 }
 
-int UG3Interface::getNumChannels() const
+int UG3InterfaceNode::getNumChannels() const
 {
     return num_channels;
 }
 
-void UG3Interface::updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,
+void UG3InterfaceNode::updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,
     OwnedArray<EventChannel>* eventChannels,
     OwnedArray<SpikeChannel>* spikeChannels,
     OwnedArray<DataStream>* sourceStreams,
@@ -119,12 +122,12 @@ void UG3Interface::updateSettings(OwnedArray<ContinuousChannel>* continuousChann
 
 }
 
-bool UG3Interface::foundInputSource()
+bool UG3InterfaceNode::foundInputSource()
 {
     return connected;
 }
 
-bool UG3Interface::startAcquisition()
+bool UG3InterfaceNode::startAcquisition()
 {
     resizeChanSamp();
 
@@ -139,7 +142,7 @@ bool UG3Interface::startAcquisition()
     return true;
 }
 
-void  UG3Interface::tryToConnect()
+void  UG3InterfaceNode::tryToConnect()
 {
     socket->shutdown();
     socket = new DatagramSocket();
@@ -164,7 +167,7 @@ void  UG3Interface::tryToConnect()
     }
 }
 
-bool UG3Interface::stopAcquisition()
+bool UG3InterfaceNode::stopAcquisition()
 {
     if (isThreadRunning())
     {
@@ -179,7 +182,7 @@ bool UG3Interface::stopAcquisition()
     return true;
 }
 
-bool UG3Interface::updateBuffer()
+bool UG3InterfaceNode::updateBuffer()
 {
     int rc = socket->read(recvbuf, num_channels * num_samp * 2, true);
 
@@ -243,7 +246,7 @@ bool UG3Interface::updateBuffer()
     return true;
 }
 
-void UG3Interface::timerCallback()
+void UG3InterfaceNode::timerCallback()
 {
     //std::cout << "Expected samples: " << int(sample_rate * 5) << ", Actual samples: " << total_samples << std::endl;
     

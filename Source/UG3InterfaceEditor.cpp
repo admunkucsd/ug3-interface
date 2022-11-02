@@ -1,12 +1,14 @@
 #include "UG3InterfaceEditor.h"
-#include "UG3Interface.h"
+
+#include "UG3InterfaceNode.h"
+#include "UG3InterfaceCanvas.h"
 
 #include <string>
 #include <iostream>
 
-using namespace UG3InterfaceNode;
+using namespace UG3Interface;
 
-UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interface *socket) : GenericEditor(parentNode)
+UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3InterfaceNode *socket) : VisualizerEditor(parentNode, "UG3 Grid", 180)
 {
     node = socket;
 
@@ -257,6 +259,11 @@ void UG3InterfaceEditor::buttonClicked(Button* button)
         node->tryToConnect();
     }
   
+}
+
+Visualizer* UG3InterfaceEditor::createNewCanvas()
+{
+    return new UG3InterfaceCanvas(node);
 }
 
 void UG3InterfaceEditor::saveCustomParametersToXml(XmlElement* xmlNode)

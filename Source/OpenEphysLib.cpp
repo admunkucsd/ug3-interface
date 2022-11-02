@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <PluginInfo.h>
-#include "UG3Interface.h"
+#include "UG3InterfaceNode.h"
 #include <string>
 #ifdef WIN32
 #include <Windows.h>
@@ -49,7 +49,7 @@ extern "C" EXPORT int getPluginInfo(int index, Plugin::PluginInfo* info)
 	case 0:
 		info->type = Plugin::Type::DATA_THREAD;
 		info->dataThread.name = "UG3 Interface";
-		info->dataThread.creator = &createDataThread<UG3InterfaceNode::UG3Interface>;
+		info->dataThread.creator = &createDataThread<UG3Interface::UG3InterfaceNode>;
 		break;
 	default:
 		return -1;
