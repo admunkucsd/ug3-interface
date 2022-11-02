@@ -2,18 +2,18 @@
 #include <Windows.h>
 #endif
 
-#include "EphysSocket.h"
-#include "EphysSocketEditor.h"
+#include "UG3Interface.h"
+#include "UG3InterfaceEditor.h"
 
-using namespace EphysSocketNode;
+using namespace UG3InterfaceNode;
 
-DataThread* EphysSocket::createDataThread(SourceNode *sn)
+DataThread* UG3Interface::createDataThread(SourceNode *sn)
 {
-    return new EphysSocket(sn);
+    return new UG3Interface(sn);
 }
 
 
-EphysSocket::EphysSocket(SourceNode* sn) : DataThread(sn),
+UG3Interface::UG3Interface(SourceNode* sn) : DataThread(sn),
     port(DEFAULT_PORT),
     num_channels(DEFAULT_NUM_CHANNELS),
     num_samp(DEFAULT_NUM_SAMPLES),
@@ -29,23 +29,23 @@ EphysSocket::EphysSocket(SourceNode* sn) : DataThread(sn),
     convbuf = (float *) malloc(num_channels * num_samp * 4);
 }
 
-std::unique_ptr<GenericEditor> EphysSocket::createEditor(SourceNode* sn)
+std::unique_ptr<GenericEditor> UG3Interface::createEditor(SourceNode* sn)
 {
 
-    std::unique_ptr<EphysSocketEditor> editor = std::make_unique<EphysSocketEditor>(sn, this);
+    std::unique_ptr<UG3InterfaceEditor> editor = std::make_unique<UG3InterfaceEditor>(sn, this);
 
     return editor;
 }
 
 
 
-EphysSocket::~EphysSocket()
+UG3Interface::~UG3Interface()
 {
     free(recvbuf);
     free(convbuf);
 }
 
-void EphysSocket::resizeChanSamp()
+void UG3Interface::resizeChanSamp()
 {
     sourceBuffers[0]->resize(num_channels, 10000);
     recvbuf = (uint16_t *)realloc(recvbuf, num_channels * num_samp * 2);
@@ -56,12 +56,12 @@ void EphysSocket::resizeChanSamp()
     ttlEventWords.resize(num_samp);
 }
 
-int EphysSocket::getNumChannels() const
+int UG3Interface::getNumChannels() const
 {
     return num_channels;
 }
 
-void EphysSocket::updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,
+void UG3Interface::updateSettings(OwnedArray<ContinuousChannel>* continuousChannels,
     OwnedArray<EventChannel>* eventChannels,
     OwnedArray<SpikeChannel>* spikeChannels,
     OwnedArray<DataStream>* sourceStreams,
@@ -119,12 +119,12 @@ void EphysSocket::updateSettings(OwnedArray<ContinuousChannel>* continuousChanne
 
 }
 
-bool EphysSocket::foundInputSource()
+bool UG3Interface::foundInputSource()
 {
     return connected;
 }
 
-bool EphysSocket::startAcquisition()
+bool UG3Interface::startAcquisition()
 {
     resizeChanSamp();
 
@@ -139,7 +139,7 @@ bool EphysSocket::startAcquisition()
     return true;
 }
 
-void  EphysSocket::tryToConnect()
+void  UG3Interface::tryToConnect()
 {
     socket->shutdown();
     socket = new DatagramSocket();
@@ -164,7 +164,7 @@ void  EphysSocket::tryToConnect()
     }
 }
 
-bool EphysSocket::stopAcquisition()
+bool UG3Interface::stopAcquisition()
 {
     if (isThreadRunning())
     {
@@ -179,7 +179,7 @@ bool EphysSocket::stopAcquisition()
     return true;
 }
 
-bool EphysSocket::updateBuffer()
+bool UG3Interface::updateBuffer()
 {
     int rc = socket->read(recvbuf, num_channels * num_samp * 2, true);
 
@@ -243,7 +243,7 @@ bool EphysSocket::updateBuffer()
     return true;
 }
 
-void EphysSocket::timerCallback()
+void UG3Interface::timerCallback()
 {
     //std::cout << "Expected samples: " << int(sample_rate * 5) << ", Actual samples: " << total_samples << std::endl;
     

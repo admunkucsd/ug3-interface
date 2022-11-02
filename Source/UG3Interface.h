@@ -10,14 +10,14 @@ const uint16_t DEFAULT_DATA_OFFSET = 32768;
 const int DEFAULT_NUM_SAMPLES = 256;
 const int DEFAULT_NUM_CHANNELS = 64;
 
-namespace EphysSocketNode
+namespace UG3InterfaceNode
 {
-    class EphysSocket : public DataThread, public Timer
+    class UG3Interface : public DataThread, public Timer
     {
 
     public:
-        EphysSocket(SourceNode* sn);
-        ~EphysSocket();
+        UG3Interface(SourceNode* sn);
+        ~UG3Interface();
 
         // Interface fulfillment
         bool foundInputSource() override;
@@ -71,7 +71,7 @@ namespace EphysSocketNode
 
         int64 currentTimestamp;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EphysSocket);
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3Interface);
     };
 }
 #endif

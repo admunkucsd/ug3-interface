@@ -1,12 +1,12 @@
-#include "EphysSocketEditor.h"
-#include "EphysSocket.h"
+#include "UG3InterfaceEditor.h"
+#include "UG3Interface.h"
 
 #include <string>
 #include <iostream>
 
-using namespace EphysSocketNode;
+using namespace UG3InterfaceNode;
 
-EphysSocketEditor::EphysSocketEditor(GenericProcessor* parentNode, EphysSocket *socket) : GenericEditor(parentNode)
+UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interface *socket) : GenericEditor(parentNode)
 {
     node = socket;
 
@@ -131,7 +131,7 @@ EphysSocketEditor::EphysSocketEditor(GenericProcessor* parentNode, EphysSocket *
    // addAndMakeVisible(transposeButton);
 }
 
-void EphysSocketEditor::labelTextChanged(Label* label)
+void UG3InterfaceEditor::labelTextChanged(Label* label)
 {
 
     if (label == channelCountInput)
@@ -215,7 +215,7 @@ void EphysSocketEditor::labelTextChanged(Label* label)
     }
 }
 
-void EphysSocketEditor::startAcquisition()
+void UG3InterfaceEditor::startAcquisition()
 {
     // Disable the whole gui
     portInput->setEnabled(false);
@@ -235,7 +235,7 @@ void EphysSocketEditor::startAcquisition()
     node->resizeChanSamp();
 }
 
-void EphysSocketEditor::stopAcquisition()
+void UG3InterfaceEditor::stopAcquisition()
 {
     // Reenable the whole gui
     portInput->setEnabled(true);
@@ -248,7 +248,7 @@ void EphysSocketEditor::stopAcquisition()
     transposeButton.setEnabled(true);
 }
 
-void EphysSocketEditor::buttonClicked(Button* button)
+void UG3InterfaceEditor::buttonClicked(Button* button)
 {
 
     if (button == connectButton)
@@ -259,7 +259,7 @@ void EphysSocketEditor::buttonClicked(Button* button)
   
 }
 
-void EphysSocketEditor::saveCustomParametersToXml(XmlElement* xmlNode)
+void UG3InterfaceEditor::saveCustomParametersToXml(XmlElement* xmlNode)
 {
     XmlElement* parameters = xmlNode->createNewChildElement("PARAMETERS");
 
@@ -271,7 +271,7 @@ void EphysSocketEditor::saveCustomParametersToXml(XmlElement* xmlNode)
     parameters->setAttribute("offset", offsetInput->getText());
 }
 
-void EphysSocketEditor::loadCustomParametersFromXml(XmlElement* xmlNode)
+void UG3InterfaceEditor::loadCustomParametersFromXml(XmlElement* xmlNode)
 {
     forEachXmlChildElement(*xmlNode, subNode)
     {

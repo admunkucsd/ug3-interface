@@ -7,18 +7,18 @@
 
 #include <VisualizerEditorHeaders.h>
 
-namespace EphysSocketNode
+namespace UG3InterfaceNode
 {
-    class EphysSocket;
+    class UG3Interface;
 
-    class EphysSocketEditor : public GenericEditor, 
+    class UG3InterfaceEditor : public GenericEditor, 
                               public Label::Listener,
                               public Button::Listener
     {
 
     public:
 
-        EphysSocketEditor(GenericProcessor* parentNode, EphysSocket *node);
+        UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interface *node);
 
         /** Button listener callback, called by button when pressed. */
         void buttonClicked(Button* button);
@@ -77,9 +77,9 @@ namespace EphysSocketNode
         TextButton transposeButton{ "Transpose" };
 
         // Parent node
-        EphysSocket* node;
+        UG3Interface* node;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EphysSocketEditor);
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3InterfaceEditor);
     };
 }
 

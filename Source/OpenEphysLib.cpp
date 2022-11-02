@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <PluginInfo.h>
-#include "EphysSocket.h"
+#include "UG3Interface.h"
 #include <string>
 #ifdef WIN32
 #include <Windows.h>
@@ -37,7 +37,7 @@ using namespace Plugin;
 extern "C" EXPORT void getLibInfo(Plugin::LibraryInfo* info)
 {
 	info->apiVersion = PLUGIN_API_VER;
-	info->name = "Ephys Socket";
+	info->name = "UG3 Interface";
 	info->libVersion = "0.2.0";
 	info->numPlugins = NUM_PLUGINS;
 }
@@ -48,8 +48,8 @@ extern "C" EXPORT int getPluginInfo(int index, Plugin::PluginInfo* info)
 	{
 	case 0:
 		info->type = Plugin::Type::DATA_THREAD;
-		info->dataThread.name = "Ephys Socket";
-		info->dataThread.creator = &createDataThread<EphysSocketNode::EphysSocket>;
+		info->dataThread.name = "UG3 Interface";
+		info->dataThread.creator = &createDataThread<UG3InterfaceNode::UG3Interface>;
 		break;
 	default:
 		return -1;
