@@ -13,3 +13,6 @@
 
 # 3. IDE generated files
 .vscode
+
+# 4. OS Files
+.DS_Store

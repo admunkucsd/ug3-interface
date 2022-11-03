@@ -7,6 +7,9 @@
 #include "UG3InterfaceEditor.h"
 #include "UG3InterfaceCanvas.h"
 
+#include "UG3InterfaceComponents.h"
+#include "Inputs/UG3Socket.h"
+
 
 using namespace UG3Interface;
 
@@ -24,9 +27,8 @@ UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     data_scale(DEFAULT_DATA_SCALE),
     sample_rate(DEFAULT_SAMPLE_RATE)
 {
-    socket = new DatagramSocket();
-    socket->bindToPort(port);
-    connected = (socket->waitUntilReady(true, 500) == 1); // Try to automatically open, dont worry if it does not work
+    input = new UG3Socket(port);
+    connected = input->connect();
     sourceBuffers.add(new DataBuffer(num_channels, 10000)); // start with 2 channels and automatically resize
     recvbuf = (uint16_t *) malloc(num_channels * num_samp * 2);
     convbuf = (float *) malloc(num_channels * num_samp * 4);
@@ -144,27 +146,7 @@ bool UG3InterfaceNode::startAcquisition()
 
 void  UG3InterfaceNode::tryToConnect()
 {
-    socket->shutdown();
-    socket = new DatagramSocket();
-    bool bound = socket->bindToPort(port);
-    if (bound)
-    {
-        std::cout << "Socket bound to port " << port << std::endl;
-        connected = (socket->waitUntilReady(true, 500) == 1);
-    }
-    else {
-        std::cout << "Could not bind socket to port " << port << std::endl;
-    }
-    
-
-    if (connected)
-    {
-        std::cout << "Socket connected." << std::endl;
-
-    }
-    else {
-        std::cout << "Socket failed to connect" << std::endl;
-    }
+    connected = input->reconnect();
 }
 
 bool UG3InterfaceNode::stopAcquisition()
@@ -184,13 +166,9 @@ bool UG3InterfaceNode::stopAcquisition()
 
 bool UG3InterfaceNode::updateBuffer()
 {
-    int rc = socket->read(recvbuf, num_channels * num_samp * 2, true);
-
-    if (rc == -1)
-    {
-        CoreServices::sendStatusMessage("Ephys Socket: Data shape mismatch");
+    bool result = input -> loadBuffer(recvbuf, num_channels*num_samp*2);
+    if(!result)
         return false;
-    }
    
     // Transpose because the chunkSize argument in addToBuffer does not seem to do anything
     if (transpose) {

@@ -2,7 +2,6 @@
 #define __EPHYSSOCKETH__
 
 #include <DataThreadHeaders.h>
-
 const int DEFAULT_PORT = 9001;
 const float DEFAULT_SAMPLE_RATE = 30000.0f;
 const float DEFAULT_DATA_SCALE = 0.195f;
@@ -12,6 +11,8 @@ const int DEFAULT_NUM_CHANNELS = 64;
 
 namespace UG3Interface
 {
+    class UG3Input;
+
     class UG3InterfaceNode : public DataThread, public Timer
     {
 
@@ -62,7 +63,7 @@ namespace UG3Interface
 
         bool connected = false;
 
-       ScopedPointer<DatagramSocket> socket;
+       ScopedPointer<UG3Input> socket;
 
         uint16_t *recvbuf;
         float *convbuf;
