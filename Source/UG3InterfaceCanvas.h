@@ -98,8 +98,8 @@ private:
     std::unique_ptr<Label> yDimInput;
     std::unique_ptr<Label> yDimLabel;
 
-    int numXPixels = 64;
-    int numYPixels = 64;
+    int numXPixels = 8;
+    int numYPixels = 8;
 
     int numChannels;
 

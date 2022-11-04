@@ -235,6 +235,7 @@ void UG3InterfaceEditor::startAcquisition()
     node->transpose = transposeButton.getToggleState();
 
     node->resizeChanSamp();
+    enable();
 }
 
 void UG3InterfaceEditor::stopAcquisition()
@@ -248,6 +249,7 @@ void UG3InterfaceEditor::stopAcquisition()
     offsetInput->setEnabled(true);
     connectButton->setEnabled(true);
     transposeButton.setEnabled(true);
+    disable();
 }
 
 void UG3InterfaceEditor::buttonClicked(Button* button)

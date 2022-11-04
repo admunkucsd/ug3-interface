@@ -48,7 +48,7 @@ void Electrode::paint(Graphics& g)
 #pragma mark - UG3InterfaceCanvas -
 
 UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_)
-    : node(node_), numChannels(0)
+    : node(node_), numChannels(64)
 {
     refreshRate = 30;
 
@@ -57,7 +57,7 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_)
     xDimLabel = std::make_unique<Label>("X Dimension", "X Dimension:");
     addAndMakeVisible(xDimLabel.get());
 
-    xDimInput = std::make_unique<Label>("X Dim Input", "64");
+    xDimInput = std::make_unique<Label>("X Dim Input", "8");
     xDimInput->setEditable(true);
     xDimInput->setColour(Label::backgroundColourId, Colour(70,70,70));
     xDimInput->setColour(Label::textColourId, Colours::lightgrey);
@@ -67,7 +67,7 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_)
     yDimLabel = std::make_unique<Label>("Y Dimension", "Y Dimension:");
     addAndMakeVisible(yDimLabel.get());
 
-    yDimInput = std::make_unique<Label>("Y Dim Input", "64");
+    yDimInput = std::make_unique<Label>("Y Dim Input", "8");
     yDimInput->setEditable(true);
     yDimInput->setColour(Label::backgroundColourId, Colour(70, 70, 70));
     yDimInput->setColour(Label::textColourId, Colours::lightgrey);

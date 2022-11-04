@@ -9,6 +9,7 @@
 
 #include "UG3InterfaceComponents.h"
 #include "Inputs/UG3Socket.h"
+#include "Inputs/UG3SimulatedInput.h"
 
 
 using namespace UG3Interface;
@@ -27,7 +28,9 @@ UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     data_scale(DEFAULT_DATA_SCALE),
     sample_rate(DEFAULT_SAMPLE_RATE)
 {
-    input = new UG3Socket(port);
+    //FIXME: Use editor ComboBox to determine input
+    //input = new UG3Socket(port);
+    input = new UG3SimulatedInput(8, 8);
     connected = input->connect();
     sourceBuffers.add(new DataBuffer(num_channels, 10000)); // start with 2 channels and automatically resize
     recvbuf = (uint16_t *) malloc(num_channels * num_samp * 2);
@@ -55,10 +58,10 @@ void UG3InterfaceNode::resizeChanSamp()
     sourceBuffers[0]->resize(num_channels, 10000);
     recvbuf = (uint16_t *)realloc(recvbuf, num_channels * num_samp * 2);
     convbuf = (float *)realloc(convbuf, num_channels * num_samp * 4);
-    sampleNumbers.resize(num_samp);
+    sampleNumbers.resize(num_channels);
     timestamps.clear();
     timestamps.insertMultiple(0, 0.0, num_samp);
-    ttlEventWords.resize(num_samp);
+    ttlEventWords.resize(num_channels);
 }
 
 int UG3InterfaceNode::getNumChannels() const
@@ -166,16 +169,17 @@ bool UG3InterfaceNode::stopAcquisition()
 
 bool UG3InterfaceNode::updateBuffer()
 {
-    bool result = input -> loadBuffer(recvbuf, num_channels*num_samp*2);
+    bool result = input -> loadBuffer((void*)recvbuf, num_channels*num_samp*2);
     if(!result)
         return false;
    
     // Transpose because the chunkSize argument in addToBuffer does not seem to do anything
+    //FIXME: update transpose buffer index access
     if (transpose) {
         int k = 0;
         for (int i = 0; i < num_samp; i++) {
             for (int j = 0; j < num_channels; j++) {
-                convbuf[k++] = 0.195 *  (float)(recvbuf[j*num_samp + i] - 32768);
+                convbuf[k++] =(float)(recvbuf[j*num_samp + i]);
             }
             sampleNumbers.set(i, total_samples + i);
             ttlEventWords.set(i, eventState);
@@ -194,7 +198,8 @@ bool UG3InterfaceNode::updateBuffer()
     } else {
         for (int i = 0; i < num_samp * num_channels; i++)
         {
-            convbuf[i] = 0.195 * (float)(recvbuf[i] - 32768);
+            //FIXME: Add scale/offset from editor
+            convbuf[i] = (float)(recvbuf[i]);
             sampleNumbers.set(i, total_samples + i);
             ttlEventWords.set(i, eventState);
 

@@ -6,7 +6,8 @@ const int DEFAULT_PORT = 9001;
 const float DEFAULT_SAMPLE_RATE = 30000.0f;
 const float DEFAULT_DATA_SCALE = 0.195f;
 const uint16_t DEFAULT_DATA_OFFSET = 32768;
-const int DEFAULT_NUM_SAMPLES = 256;
+//FIXME: Revert back DEFAULT_NUM_SAMPLES
+const int DEFAULT_NUM_SAMPLES = 1;
 const int DEFAULT_NUM_CHANNELS = 64;
 
 namespace UG3Interface
@@ -37,7 +38,7 @@ namespace UG3Interface
         float sample_rate;
         float data_scale;
         uint16_t data_offset;
-        bool transpose = true;
+        bool transpose = false;
         int num_samp;
         int num_channels;
 
@@ -52,7 +53,8 @@ namespace UG3Interface
         std::unique_ptr<GenericEditor> createEditor(SourceNode* sn);
         static DataThread* createDataThread(SourceNode* sn);
 
-        const float* getLatestValues() { return 0;}
+        //FIXME: Use peakToPeak rather than single sample buffer
+        const float* getLatestValues() { return convbuf;}
             
     private:
 
@@ -63,8 +65,8 @@ namespace UG3Interface
 
         bool connected = false;
 
-       ScopedPointer<UG3Input> socket;
-
+        ScopedPointer<UG3Input> input;
+        
         uint16_t *recvbuf;
         float *convbuf;
 
