@@ -93,13 +93,13 @@ UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
 {
     //FIXME: Use editor ComboBox to determine input
     //input = new UG3Socket(port);
-    input = new UG3SimulatedInput(num_channels_x, num_channels_y, DEFAULT_UPDATE_INTERVAL, getInputMaxValue());
+    input = new UG3SimulatedInput(num_channels_x, num_channels_y, num_samp, getInputMaxValue());
     connected = input->connect();
     sourceBuffers.add(new DataBuffer(num_channels, 10000)); // start with 2 channels and automatically resize
     recvbuf = (uint16_t *) malloc(num_channels * num_samp * 2);
     convbuf = (float *) malloc(num_channels * num_samp * 4);
     
-    activityDataContainer = std::make_unique<ActivityDataContainer>(num_channels, DEFAULT_UPDATE_INTERVAL);
+    activityDataContainer = std::make_unique<ActivityDataContainer>(num_channels, num_samp);
     //activityDataContainer.reset();
 }
 
@@ -238,51 +238,25 @@ bool UG3InterfaceNode::updateBuffer()
     bool result = input -> loadBuffer((void*)recvbuf, num_channels*num_samp*2);
     if(!result)
         return false;
-   
-    // Transpose because the chunkSize argument in addToBuffer does not seem to do anything
-    //FIXME: update transpose buffer index access
-    if (transpose) {
-        int k = 0;
-        for (int i = 0; i < num_samp; i++) {
-            for (int j = 0; j < num_channels; j++) {
-                convbuf[k] =(float)(recvbuf[j*num_samp + i]);
-                activityDataContainer->addSample(convbuf[k],k);
-                k+=1;
-            }
-            sampleNumbers.set(i, total_samples + i);
-            ttlEventWords.set(i, eventState);
-
-            if ((total_samples + i) % 15000 == 0)
-            {
-                if (eventState == 0)
-                    eventState = 1;
-                else
-                    eventState = 0;
-
-                std::cout << eventState << std::endl;
-            }
-                
+    //FIXME: Add back offset/scale
+    int k = 0;
+    for (int i = 0; i < num_samp; i++) {
+        for (int j = 0; j < num_channels; j++) {
+            convbuf[k] =(float)(recvbuf[i*num_channels + j]);
+            activityDataContainer->addSample(convbuf[k],j);
+            k+=1;
         }
-    } else {
-        for (int i = 0; i < num_samp * num_channels; i++)
+        sampleNumbers.set(i, total_samples + i);
+        ttlEventWords.set(i, eventState);
+
+        if ((total_samples + i) % 15000 == 0)
         {
-            //FIXME: Add scale/offset from editor
-            convbuf[i] = (float)(recvbuf[i]);
-            activityDataContainer->addSample(convbuf[i],i);
-            sampleNumbers.set(i, total_samples + i);
-            ttlEventWords.set(i, eventState);
+            if (eventState == 0)
+                eventState = 1;
+            else
+                eventState = 0;
 
-            if ((total_samples + i) % 15000 == 0)
-            {
-                if (eventState == 0)
-                    eventState = 1;
-                else
-                    eventState = 0;
-
-                std::cout << eventState << std::endl;
-            }
-
-
+            std::cout << eventState << std::endl;
         }
     }
 

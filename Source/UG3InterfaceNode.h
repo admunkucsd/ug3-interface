@@ -6,11 +6,9 @@ const int DEFAULT_PORT = 9001;
 const float DEFAULT_SAMPLE_RATE = 30000.0f;
 const float DEFAULT_DATA_SCALE = 0.195f;
 const uint16_t DEFAULT_DATA_OFFSET = 32768;
-//FIXME: Revert back DEFAULT_NUM_SAMPLES
-const int DEFAULT_NUM_SAMPLES = 1;
+const int DEFAULT_NUM_SAMPLES = 10;
 const int DEFAULT_NUM_CHANNELS_X = 64;
 const int DEFAULT_NUM_CHANNELS_Y = 64;
-const int DEFAULT_UPDATE_INTERVAL = 10;
 const uint8_t DEFAULT_CHANNEL_BITWIDTH = 16;
 
 namespace UG3Interface
@@ -67,7 +65,6 @@ namespace UG3Interface
         float sample_rate;
         float data_scale;
         uint16_t data_offset;
-        bool transpose = false;
         int num_samp;
         int num_channels;
         int num_channels_x;
@@ -82,6 +79,7 @@ namespace UG3Interface
         void resizeChanSamp();
         void tryToConnect();
         
+        /**Used to calculate the maximum value for a given input bit width**/
         unsigned long long getInputMaxValue();
 
         std::unique_ptr<GenericEditor> createEditor(SourceNode* sn);

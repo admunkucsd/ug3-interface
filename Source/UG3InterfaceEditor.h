@@ -80,8 +80,6 @@ namespace UG3Interface
         ScopedPointer<Label> offsetLabel;
         ScopedPointer<Label> offsetInput;
 
-        // Transpose
-        TextButton transposeButton{ "Transpose" };
 
         // Parent node
         UG3InterfaceNode* node;

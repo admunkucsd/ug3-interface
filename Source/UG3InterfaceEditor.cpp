@@ -127,10 +127,6 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
     offsetInput->addListener(this);
     addAndMakeVisible(offsetInput);
 
-    transposeButton.setBounds(155, 95, 65, 20);
-    transposeButton.setClickingTogglesState(true);
-    transposeButton.setToggleState(true, false);
-   // addAndMakeVisible(transposeButton);
 }
 
 void UG3InterfaceEditor::labelTextChanged(Label* label)
@@ -227,12 +223,10 @@ void UG3InterfaceEditor::startAcquisition()
     scaleInput->setEnabled(false);
     offsetInput->setEnabled(false);
     connectButton->setEnabled(false);
-    transposeButton.setEnabled(false);
 
     // Set the channels etc
     node->data_scale = scaleInput->getText().getFloatValue();
     node->data_offset = offsetInput->getText().getIntValue();
-    node->transpose = transposeButton.getToggleState();
 
     node->resizeChanSamp();
     enable();
@@ -248,7 +242,6 @@ void UG3InterfaceEditor::stopAcquisition()
     scaleInput->setEnabled(true);
     offsetInput->setEnabled(true);
     connectButton->setEnabled(true);
-    transposeButton.setEnabled(true);
     disable();
 }
 

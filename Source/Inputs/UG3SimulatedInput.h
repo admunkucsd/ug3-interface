@@ -15,18 +15,21 @@
 namespace UG3Interface {
 class UG3SimulatedInput : public UG3Input {
 public:
-    UG3SimulatedInput(int channelsX = 64, int channelsY = 64, int updateInterval = 10, unsigned long long maxValue = 0xffff);
+    UG3SimulatedInput(int channelsX = 64, int channelsY = 64, int samples = 10, unsigned long long maxValue = 0xffff);
     ~UG3SimulatedInput();
     bool connect() override;
     bool reconnect() override;
+    
+    /**loads buffer in such a way that a wave effect is created covering
+     the entire color theme's spectrum**/
     bool loadBuffer(void * destBuffer, int maxBytestoRead) override;
     
 private:
     uint16_t *simulatedValues;
     int channelsX;
     int channelsY;
-    int updateInterval;
     int counter;
+    int samples;
     unsigned long long maxValue;
     uint8_t waveIndex = 0;
 };
