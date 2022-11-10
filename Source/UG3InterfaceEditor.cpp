@@ -265,7 +265,7 @@ void UG3InterfaceEditor::buttonClicked(Button* button)
 
 Visualizer* UG3InterfaceEditor::createNewCanvas()
 {
-    return new UG3InterfaceCanvas(node);
+    return new UG3InterfaceCanvas(node, node->num_channels);
 }
 
 void UG3InterfaceEditor::saveCustomParametersToXml(XmlElement* xmlNode)
@@ -290,7 +290,7 @@ void UG3InterfaceEditor::loadCustomParametersFromXml(XmlElement* xmlNode)
             node->port = subNode->getIntAttribute("port", DEFAULT_PORT);
 
             channelCountInput->setText(subNode->getStringAttribute("numchan", ""), dontSendNotification);
-            node->num_channels = subNode->getIntAttribute("numchan", DEFAULT_NUM_CHANNELS);
+            node->num_channels = subNode->getIntAttribute("numchan", DEFAULT_NUM_CHANNELS_X*DEFAULT_NUM_CHANNELS_Y);
 
             bufferSizeInput->setText(subNode->getStringAttribute("numsamp", ""), dontSendNotification);
             node->num_samp = subNode->getIntAttribute("numsamp", DEFAULT_NUM_SAMPLES);

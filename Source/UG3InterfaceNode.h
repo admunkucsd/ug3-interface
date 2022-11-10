@@ -8,11 +8,39 @@ const float DEFAULT_DATA_SCALE = 0.195f;
 const uint16_t DEFAULT_DATA_OFFSET = 32768;
 //FIXME: Revert back DEFAULT_NUM_SAMPLES
 const int DEFAULT_NUM_SAMPLES = 1;
-const int DEFAULT_NUM_CHANNELS = 64;
+const int DEFAULT_NUM_CHANNELS_X = 64;
+const int DEFAULT_NUM_CHANNELS_Y = 64;
+const int DEFAULT_UPDATE_INTERVAL = 10;
 
 namespace UG3Interface
 {
     class UG3Input;
+
+    class ActivityDataContainer
+    {
+    public:
+        /** Constructor */
+        ActivityDataContainer(int numChannels, int updateInterval);
+
+        /** Returns a pointer to the peak-to-peak values across channels*/
+        const float* getPeakToPeakValues();
+
+        /** Adds an incoming sample for a given channel */
+        void addSample(float sample, int channel);
+
+        /** Reset min/max values*/
+        void reset();
+
+    private:
+
+        Array<float> minChannelValues;
+        Array<float> maxChannelValues;
+        Array<float> peakToPeakValues;
+
+        int counter;
+        int updateInterval;
+
+    };
 
     class UG3InterfaceNode : public DataThread, public Timer
     {
@@ -41,6 +69,9 @@ namespace UG3Interface
         bool transpose = false;
         int num_samp;
         int num_channels;
+        int num_channels_x;
+        int num_channels_y;
+
 
         int64 total_samples;
         float relative_sample_rate;
@@ -53,8 +84,9 @@ namespace UG3Interface
         std::unique_ptr<GenericEditor> createEditor(SourceNode* sn);
         static DataThread* createDataThread(SourceNode* sn);
 
-        //FIXME: Use peakToPeak rather than single sample buffer
-        const float* getLatestValues() { return convbuf;}
+        const float* getLatestValues() {
+            return activityDataContainer->getPeakToPeakValues();
+        }
             
     private:
 
@@ -66,6 +98,8 @@ namespace UG3Interface
         bool connected = false;
 
         ScopedPointer<UG3Input> input;
+        
+        std::unique_ptr<ActivityDataContainer> activityDataContainer;
         
         uint16_t *recvbuf;
         float *convbuf;

@@ -14,6 +14,66 @@
 
 using namespace UG3Interface;
 
+ActivityDataContainer::ActivityDataContainer(int numChannels, int updateInterval_)
+{
+    for (int i = 0; i < numChannels; i++)
+        peakToPeakValues.add(0);
+
+    updateInterval = updateInterval_;
+
+    reset();
+}
+
+const float* ActivityDataContainer::getPeakToPeakValues() {
+
+    return peakToPeakValues.getRawDataPointer();
+}
+
+void ActivityDataContainer::addSample(float sample, int channel)
+{
+    //std::cout << "in addSample for sample/channel: " <<sample << "/" << channel <<std::endl;
+    if (channel == 0)
+    {
+        if (counter == updateInterval)
+            reset();
+
+        counter++;
+    }
+
+    //if (counter % 10 == 0)
+    //{
+    if (sample < minChannelValues[channel])
+    {
+        minChannelValues.set(channel, sample);
+        return;
+    }
+
+    if (sample > maxChannelValues[channel])
+    {
+        maxChannelValues.set(channel, sample);
+    }
+    //}
+
+}
+
+void ActivityDataContainer::reset()
+{
+
+    //std::cout << "Reset." << std::endl;
+
+    for (int i = 0; i < peakToPeakValues.size(); i++)
+    {
+
+        peakToPeakValues.set(i, maxChannelValues[i] - minChannelValues[i]);
+        
+        minChannelValues.set(i, 999999.9f);
+        maxChannelValues.set(i, -999999.9f);
+    }
+
+    counter = 0;
+
+}
+
 DataThread* UG3InterfaceNode::createDataThread(SourceNode *sn)
 {
     return new UG3InterfaceNode(sn);
@@ -22,19 +82,24 @@ DataThread* UG3InterfaceNode::createDataThread(SourceNode *sn)
 
 UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     port(DEFAULT_PORT),
-    num_channels(DEFAULT_NUM_CHANNELS),
+    num_channels(DEFAULT_NUM_CHANNELS_X*DEFAULT_NUM_CHANNELS_Y),
     num_samp(DEFAULT_NUM_SAMPLES),
     data_offset(DEFAULT_DATA_OFFSET),
     data_scale(DEFAULT_DATA_SCALE),
-    sample_rate(DEFAULT_SAMPLE_RATE)
+    sample_rate(DEFAULT_SAMPLE_RATE),
+    num_channels_x(DEFAULT_NUM_CHANNELS_X),
+    num_channels_y(DEFAULT_NUM_CHANNELS_Y)
 {
     //FIXME: Use editor ComboBox to determine input
     //input = new UG3Socket(port);
-    input = new UG3SimulatedInput(8, 8);
+    input = new UG3SimulatedInput(num_channels_x, num_channels_y, DEFAULT_UPDATE_INTERVAL);
     connected = input->connect();
     sourceBuffers.add(new DataBuffer(num_channels, 10000)); // start with 2 channels and automatically resize
     recvbuf = (uint16_t *) malloc(num_channels * num_samp * 2);
     convbuf = (float *) malloc(num_channels * num_samp * 4);
+    
+    activityDataContainer = std::make_unique<ActivityDataContainer>(num_channels, DEFAULT_UPDATE_INTERVAL);
+    //activityDataContainer.reset();
 }
 
 std::unique_ptr<GenericEditor> UG3InterfaceNode::createEditor(SourceNode* sn)
@@ -179,7 +244,9 @@ bool UG3InterfaceNode::updateBuffer()
         int k = 0;
         for (int i = 0; i < num_samp; i++) {
             for (int j = 0; j < num_channels; j++) {
-                convbuf[k++] =(float)(recvbuf[j*num_samp + i]);
+                convbuf[k] =(float)(recvbuf[j*num_samp + i]);
+                activityDataContainer->addSample(convbuf[k],k);
+                k+=1;
             }
             sampleNumbers.set(i, total_samples + i);
             ttlEventWords.set(i, eventState);
@@ -200,6 +267,7 @@ bool UG3InterfaceNode::updateBuffer()
         {
             //FIXME: Add scale/offset from editor
             convbuf[i] = (float)(recvbuf[i]);
+            activityDataContainer->addSample(convbuf[i],i);
             sampleNumbers.set(i, total_samples + i);
             ttlEventWords.set(i, eventState);
 
@@ -217,7 +285,7 @@ bool UG3InterfaceNode::updateBuffer()
         }
     }
 
-    sourceBuffers[0]->addToBuffer(convbuf, 
+    sourceBuffers[0]->addToBuffer(convbuf,
         sampleNumbers.getRawDataPointer(),
         timestamps.getRawDataPointer(),
         ttlEventWords.getRawDataPointer(),

@@ -47,7 +47,7 @@ class UG3InterfaceCanvas : public Visualizer,
 public:
 
     /** Constructor */
-    UG3InterfaceCanvas(class UG3InterfaceNode*);
+    UG3InterfaceCanvas(class UG3InterfaceNode*, int numChannels);
 
     /** Destructor */
     virtual ~UG3InterfaceCanvas() override;
@@ -98,8 +98,8 @@ private:
     std::unique_ptr<Label> yDimInput;
     std::unique_ptr<Label> yDimLabel;
 
-    int numXPixels = 8;
-    int numYPixels = 8;
+    int numXPixels = 64;
+    int numYPixels = 64;
 
     int numChannels;
 

@@ -20,7 +20,7 @@ public:
     /** Returns true if the input is able to reconnect to the source */
     virtual bool reconnect() = 0;
     
-    /** Returns true if the input is able to disconnect to the source */
+    /** Returns true if the input is able to load data from the source */
     virtual bool loadBuffer(void * destBuffer, int maxBytestoRead) = 0;
 };
 
