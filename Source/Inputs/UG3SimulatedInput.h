@@ -15,7 +15,7 @@
 namespace UG3Interface {
 class UG3SimulatedInput : public UG3Input {
 public:
-    UG3SimulatedInput(int channelsX = 64, int channelsY = 64, int updateInterval = 10);
+    UG3SimulatedInput(int channelsX = 64, int channelsY = 64, int updateInterval = 10, unsigned long long maxValue = 0xffff);
     ~UG3SimulatedInput();
     bool connect() override;
     bool reconnect() override;
@@ -27,6 +27,7 @@ private:
     int channelsY;
     int updateInterval;
     int counter;
+    unsigned long long maxValue;
     uint8_t waveIndex = 0;
 };
 }

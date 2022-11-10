@@ -265,7 +265,7 @@ void UG3InterfaceEditor::buttonClicked(Button* button)
 
 Visualizer* UG3InterfaceEditor::createNewCanvas()
 {
-    return new UG3InterfaceCanvas(node, node->num_channels);
+    return new UG3InterfaceCanvas(node, node->num_channels, node->getInputMaxValue());
 }
 
 void UG3InterfaceEditor::saveCustomParametersToXml(XmlElement* xmlNode)

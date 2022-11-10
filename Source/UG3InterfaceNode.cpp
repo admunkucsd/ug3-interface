@@ -88,11 +88,12 @@ UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     data_scale(DEFAULT_DATA_SCALE),
     sample_rate(DEFAULT_SAMPLE_RATE),
     num_channels_x(DEFAULT_NUM_CHANNELS_X),
-    num_channels_y(DEFAULT_NUM_CHANNELS_Y)
+    num_channels_y(DEFAULT_NUM_CHANNELS_Y),
+    bitWidth(DEFAULT_CHANNEL_BITWIDTH)
 {
     //FIXME: Use editor ComboBox to determine input
     //input = new UG3Socket(port);
-    input = new UG3SimulatedInput(num_channels_x, num_channels_y, DEFAULT_UPDATE_INTERVAL);
+    input = new UG3SimulatedInput(num_channels_x, num_channels_y, DEFAULT_UPDATE_INTERVAL, getInputMaxValue());
     connected = input->connect();
     sourceBuffers.add(new DataBuffer(num_channels, 10000)); // start with 2 channels and automatically resize
     recvbuf = (uint16_t *) malloc(num_channels * num_samp * 2);
@@ -305,3 +306,13 @@ void UG3InterfaceNode::timerCallback()
 
     //total_samples = 0;
 }
+
+unsigned long long UG3InterfaceNode::getInputMaxValue() {
+    if(bitWidth > 64)
+        return 0;
+    else if (bitWidth == 64)
+        return 0xffffffffffffffff;
+    else
+        return (1 << bitWidth) - 1;
+}
+

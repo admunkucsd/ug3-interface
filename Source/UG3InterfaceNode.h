@@ -11,6 +11,7 @@ const int DEFAULT_NUM_SAMPLES = 1;
 const int DEFAULT_NUM_CHANNELS_X = 64;
 const int DEFAULT_NUM_CHANNELS_Y = 64;
 const int DEFAULT_UPDATE_INTERVAL = 10;
+const uint8_t DEFAULT_CHANNEL_BITWIDTH = 16;
 
 namespace UG3Interface
 {
@@ -80,6 +81,8 @@ namespace UG3Interface
 
         void resizeChanSamp();
         void tryToConnect();
+        
+        unsigned long long getInputMaxValue();
 
         std::unique_ptr<GenericEditor> createEditor(SourceNode* sn);
         static DataThread* createDataThread(SourceNode* sn);
@@ -103,6 +106,7 @@ namespace UG3Interface
         
         uint16_t *recvbuf;
         float *convbuf;
+        uint8_t bitWidth;
 
         Array<int64> sampleNumbers;
         Array<double> timestamps;

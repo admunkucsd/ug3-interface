@@ -47,7 +47,7 @@ class UG3InterfaceCanvas : public Visualizer,
 public:
 
     /** Constructor */
-    UG3InterfaceCanvas(class UG3InterfaceNode*, int numChannels);
+    UG3InterfaceCanvas(class UG3InterfaceNode*, int numChannels, unsigned long long inputMaxValue = 0xffff);
 
     /** Destructor */
     virtual ~UG3InterfaceCanvas() override;
@@ -102,6 +102,7 @@ private:
     int numYPixels = 64;
 
     int numChannels;
+    unsigned long long inputMaxValue;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3InterfaceCanvas);
 };

@@ -47,32 +47,32 @@ void Electrode::paint(Graphics& g)
 
 #pragma mark - UG3InterfaceCanvas -
 
-UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, int numChannels)
-    : node(node_), numChannels(numChannels)
+UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, int numChannels, unsigned long long inputMaxValue)
+    : node(node_), numChannels(numChannels), inputMaxValue(inputMaxValue)
 {
     refreshRate = 30;
 
     updateDisplayDimensions();
 
     xDimLabel = std::make_unique<Label>("X Dimension", "X Dimension:");
-    addAndMakeVisible(xDimLabel.get());
+    //addAndMakeVisible(xDimLabel.get());
 
     xDimInput = std::make_unique<Label>("X Dim Input", "64");
     xDimInput->setEditable(true);
     xDimInput->setColour(Label::backgroundColourId, Colour(70,70,70));
     xDimInput->setColour(Label::textColourId, Colours::lightgrey);
     xDimInput->addListener(this);
-    addAndMakeVisible(xDimInput.get());
+    //addAndMakeVisible(xDimInput.get());
 
     yDimLabel = std::make_unique<Label>("Y Dimension", "Y Dimension:");
-    addAndMakeVisible(yDimLabel.get());
+    //addAndMakeVisible(yDimLabel.get());
 
     yDimInput = std::make_unique<Label>("Y Dim Input", "64");
     yDimInput->setEditable(true);
     yDimInput->setColour(Label::backgroundColourId, Colour(70, 70, 70));
     yDimInput->setColour(Label::textColourId, Colours::lightgrey);
     yDimInput->addListener(this);
-    addAndMakeVisible(yDimInput.get());
+    //addAndMakeVisible(yDimInput.get());
 
 }
 
@@ -173,7 +173,7 @@ void UG3InterfaceCanvas::refresh()
 
     for (int i = 0; i < maxChan; i++)
     {
-        electrodes[i]->setColour(ColourScheme::getColourForNormalizedValue((float)(peakToPeakValues[i] / 200)));
+        electrodes[i]->setColour(ColourScheme::getColourForNormalizedValue((float)(peakToPeakValues[i] / inputMaxValue)));
     }
 
     repaint();
