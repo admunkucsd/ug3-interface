@@ -237,6 +237,7 @@ void UG3InterfaceEditor::startAcquisition()
     scaleInput->setEnabled(false);
     offsetInput->setEnabled(false);
     connectButton->setEnabled(false);
+    inputSelector->setEnabled(false);
 
     // Set the channels etc
     node->data_scale = scaleInput->getText().getFloatValue();
@@ -256,6 +257,8 @@ void UG3InterfaceEditor::stopAcquisition()
     scaleInput->setEnabled(true);
     offsetInput->setEnabled(true);
     connectButton->setEnabled(true);
+    inputSelector->setEnabled(true);
+
     disable();
 }
 
@@ -271,7 +274,8 @@ void UG3InterfaceEditor::buttonClicked(Button* button)
 }
 
 void UG3InterfaceEditor::comboBoxChanged (ComboBox* combo){
-    
+    node->changeInput(combo->getSelectedId() - 1);
+    CoreServices::updateSignalChain (this);
 }
 
 void UG3InterfaceEditor::populateInputs ()

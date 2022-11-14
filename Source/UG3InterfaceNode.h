@@ -90,6 +90,8 @@ namespace UG3Interface
         }
                                 
         std::vector<String> getInputNames();
+        
+        void changeInput(int index);
 
             
     private:

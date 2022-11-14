@@ -14,6 +14,10 @@ namespace UG3Interface {
 
 class UG3Input {
 public:
+    
+    /** Returns true if the input is able to connect to the source */
+    virtual ~UG3Input() = default;
+    
     /** Returns true if the input is able to connect to the source */
     virtual bool connect() = 0;
     
