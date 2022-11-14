@@ -32,7 +32,7 @@ bool UG3SimulatedInput::loadBuffer(void * destBuffer, int maxBytestoRead){
             }
         }
         else {
-            memset(simulatedValues+channelsX*channelsY*sizeof(simulatedValues), 0, channelsX*channelsY*sizeof(*simulatedValues));
+            memset(simulatedValues+channelsX*channelsY*sizeof(simulatedValues)*sampleIndex, 0, channelsX*channelsY*sizeof(*simulatedValues));
         }
     }
     waveIndex = (waveIndex + 1) % channelsX;

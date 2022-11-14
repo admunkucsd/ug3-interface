@@ -12,19 +12,19 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
 {
     node = socket;
 
-    desiredWidth = 240;
+    desiredWidth = 400;
 
     // Add connect button
     connectButton = new UtilityButton("CONNECT", Font("Small Text", 12, Font::bold));
     connectButton->setRadius(3.0f);
-    connectButton->setBounds(10, 35, 70, 20);
+    connectButton->setBounds(301, 35, 70, 20);
     connectButton->addListener(this);
     addAndMakeVisible(connectButton);
 
     // Port
     portLabel = new Label("Port", "Port");
     portLabel->setFont(Font("Small Text", 10, Font::plain));
-    portLabel->setBounds(5, 60, 65, 8);
+    portLabel->setBounds(296, 60, 65, 8);
     portLabel->setColour(Label::textColourId, Colours::darkgrey);
     addAndMakeVisible(portLabel);
 
@@ -33,26 +33,26 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
     portInput->setColour(Label::backgroundColourId, Colours::lightgrey);
     portInput->setEditable(true);
     portInput->addListener(this);
-    portInput->setBounds(10, 70, 65, 15);
+    portInput->setBounds(301, 70, 65, 15);
     addAndMakeVisible(portInput);
 
     //---
     bufferSizeMainLabel = new Label("BUFFER SIZE", "BUFFER SIZE");
     bufferSizeMainLabel->setFont(Font("Small Text", 12, Font::plain));
-    bufferSizeMainLabel->setBounds(114, 30, 95, 15);
+    bufferSizeMainLabel->setBounds(167, 30, 95, 15);
     bufferSizeMainLabel->setColour(Label::textColourId, Colours::darkgrey);
     addAndMakeVisible(bufferSizeMainLabel);
 
     // Num chans
     channelCountLabel = new Label("CHANNELS", "CHANNELS");
     channelCountLabel->setFont(Font("Small Text", 10, Font::plain));
-    channelCountLabel->setBounds(92, 48, 65, 8);
+    channelCountLabel->setBounds(145, 48, 65, 8);
     channelCountLabel->setColour(Label::textColourId, Colours::darkgrey);
     addAndMakeVisible(channelCountLabel);
 
     channelCountInput = new Label("Channel count", String(node->num_channels));
     channelCountInput->setFont(Font("Small Text", 10, Font::plain));
-    channelCountInput->setBounds(100, 60, 50, 15);
+    channelCountInput->setBounds(153, 60, 50, 15);
     channelCountInput->setColour(Label::backgroundColourId, Colours::lightgrey);
     channelCountInput->setEditable(true);
     channelCountInput->addListener(this);
@@ -60,7 +60,7 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
 
     xLabel = new Label("X", "X");
     xLabel->setFont(Font("Small Text", 15, Font::plain));
-    xLabel->setBounds(149, 53, 30, 30);
+    xLabel->setBounds(202, 53, 30, 30);
     xLabel->setColour(Label::textColourId, Colours::darkgrey);
     addAndMakeVisible(xLabel);
 
@@ -68,13 +68,13 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
     // Num samples
     bufferSizeLabel = new Label("SAMPLES", "SAMPLES");
     bufferSizeLabel->setFont(Font("Small Text", 10, Font::plain));
-    bufferSizeLabel->setBounds(164, 48, 65, 8);
+    bufferSizeLabel->setBounds(217, 48, 65, 8);
     bufferSizeLabel->setColour(Label::textColourId, Colours::darkgrey);
     addAndMakeVisible(bufferSizeLabel);
 
     bufferSizeInput = new Label ("Buffer Size", String(node->num_samp));
     bufferSizeInput->setFont(Font("Small Text", 10, Font::plain));
-    bufferSizeInput->setBounds(170, 60, 50, 15);
+    bufferSizeInput->setBounds(223, 60, 50, 15);
     bufferSizeInput->setEditable(true);
     bufferSizeInput->setColour(Label::backgroundColourId, Colours::lightgrey);
     bufferSizeInput->addListener(this);
@@ -83,13 +83,13 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
     // Fs
     sampleRateLabel = new Label("FREQ (HZ)", "FREQ (HZ)");
     sampleRateLabel->setFont(Font("Small Text", 10, Font::plain));
-    sampleRateLabel->setBounds(5, 92, 85, 8);
+    sampleRateLabel->setBounds(296, 92, 85, 8);
     sampleRateLabel->setColour(Label::textColourId, Colours::darkgrey);
     addAndMakeVisible(sampleRateLabel);
 
     sampleRateInput = new Label("Fs (Hz)", String((int) node->sample_rate));
     sampleRateInput->setFont(Font("Small Text", 10, Font::plain));
-    sampleRateInput->setBounds(10, 105, 65, 15);
+    sampleRateInput->setBounds(301, 105, 65, 15);
     sampleRateInput->setEditable(true);
     sampleRateInput->setColour(Label::backgroundColourId, Colours::lightgrey);
     sampleRateInput->addListener(this);
@@ -100,13 +100,13 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
     // Scale
     scaleLabel = new Label("Scale", "Scale");
     scaleLabel->setFont(Font("Small Text", 10, Font::plain));
-    scaleLabel->setBounds(85, 92, 65, 8);
+    scaleLabel->setBounds(145, 92, 65, 8);
     scaleLabel->setColour(Label::textColourId, Colours::darkgrey);
     addAndMakeVisible(scaleLabel);
 
     scaleInput = new Label("Scale", String(node->data_scale));
     scaleInput->setFont(Font("Small Text", 10, Font::plain));
-    scaleInput->setBounds(90, 105, 50, 15);
+    scaleInput->setBounds(153, 105, 50, 15);
     scaleInput->setEditable(true);
     scaleInput->setColour(Label::backgroundColourId, Colours::lightgrey);
     scaleInput->addListener(this);
@@ -115,17 +115,31 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
     // Offset
     offsetLabel = new Label("Offset", "Offset");
     offsetLabel->setFont(Font("Small Text", 10, Font::plain));
-    offsetLabel->setBounds(150, 92, 65, 8);
+    offsetLabel->setBounds(217, 92, 65, 8);
     offsetLabel->setColour(Label::textColourId, Colours::darkgrey);
     addAndMakeVisible(offsetLabel);
 
     offsetInput = new Label("Offset", String(node->data_offset));
     offsetInput->setFont(Font("Small Text", 10, Font::plain));
-    offsetInput->setBounds(155, 105, 50, 15);
+    offsetInput->setBounds(223, 105, 50, 15);
     offsetInput->setEditable(true);
     offsetInput->setColour(Label::backgroundColourId, Colours::lightgrey);
     offsetInput->addListener(this);
     addAndMakeVisible(offsetInput);
+    
+    //Input
+    inputLabel = new Label ("Input", "Input");
+    inputLabel -> setFont(Font("Small Text", 10, Font::plain));
+    inputLabel->setBounds (5, 48, 65, 8);
+    inputLabel->setColour(Label::textColourId, Colours::darkgrey);
+    addAndMakeVisible (inputLabel);
+    
+    inputSelector = new ComboBox ("Input Selector");
+    inputSelector->setBounds (11, 60, 120, 20);
+    inputSelector->addListener (this);
+    addAndMakeVisible (inputSelector);
+    
+    populateInputs();
 
 }
 
@@ -255,6 +269,22 @@ void UG3InterfaceEditor::buttonClicked(Button* button)
     }
   
 }
+
+void UG3InterfaceEditor::comboBoxChanged (ComboBox* combo){
+    
+}
+
+void UG3InterfaceEditor::populateInputs ()
+{
+    int i = 0;
+    for (String input:node->getInputNames())
+    {
+        inputSelector->addItem(input, i + 1);
+        i++;
+    }
+    inputSelector->setSelectedId (1, dontSendNotification);
+}
+
 
 Visualizer* UG3InterfaceEditor::createNewCanvas()
 {

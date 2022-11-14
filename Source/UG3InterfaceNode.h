@@ -88,6 +88,9 @@ namespace UG3Interface
         const float* getLatestValues() {
             return activityDataContainer->getPeakToPeakValues();
         }
+                                
+        std::vector<String> getInputNames();
+
             
     private:
 
@@ -102,6 +105,7 @@ namespace UG3Interface
         
         std::unique_ptr<ActivityDataContainer> activityDataContainer;
         
+        static const std::vector<String> inputNames; 
         uint16_t *recvbuf;
         float *convbuf;
         uint8_t bitWidth;

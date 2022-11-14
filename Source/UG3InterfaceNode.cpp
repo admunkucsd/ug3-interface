@@ -74,11 +74,16 @@ void ActivityDataContainer::reset()
 
 }
 
+std::vector<String> UG3InterfaceNode::getInputNames() {
+    return inputNames;
+}
+
 DataThread* UG3InterfaceNode::createDataThread(SourceNode *sn)
 {
     return new UG3InterfaceNode(sn);
 }
 
+const std::vector<String> UG3InterfaceNode::inputNames = std::vector<String>{"Simulated", "Socket"};
 
 UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     port(DEFAULT_PORT),

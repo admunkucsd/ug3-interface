@@ -13,7 +13,8 @@ namespace UG3Interface
 
     class UG3InterfaceEditor : public VisualizerEditor,
                               public Label::Listener,
-                              public Button::Listener
+                              public Button::Listener,
+                              public ComboBox::Listener
     {
 
     public:
@@ -29,6 +30,9 @@ namespace UG3Interface
 
         /** Button listener callback, called by button when pressed. */
         void buttonClicked(Button* button);
+        
+        /** Responds to combo box selections */
+        void comboBoxChanged (ComboBox* combo);
 
         /** Called by processor graph in beginning of the acqusition, disables editor completly. */
         void startAcquisition();
@@ -44,6 +48,9 @@ namespace UG3Interface
 
         /** Called when label is changed */
         void labelTextChanged(Label* label);
+        
+        void populateInputs();
+
 
     private:
 
@@ -79,6 +86,11 @@ namespace UG3Interface
         // Offset
         ScopedPointer<Label> offsetLabel;
         ScopedPointer<Label> offsetInput;
+        
+        ScopedPointer<ComboBox> inputSelector;
+        ScopedPointer<Label>    inputLabel;
+
+
 
 
         // Parent node
