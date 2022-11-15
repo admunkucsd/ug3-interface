@@ -6,6 +6,7 @@
 //
 
 #include "UG3SimulatedInput.h"
+#include <cmath>
 
 using namespace UG3Interface;
 
@@ -22,7 +23,7 @@ bool UG3SimulatedInput::connect(){
 bool UG3SimulatedInput::reconnect(){
     return true;
 }
-bool UG3SimulatedInput::loadBuffer(void * destBuffer, int maxBytestoRead){
+void UG3SimulatedInput::makeColorWave() {
     for(int sampleIndex = 0; sampleIndex < samples; sampleIndex++) {
         if(sampleIndex % 2) {
             for(int y = 0; y < channelsY; y++) {
@@ -36,6 +37,25 @@ bool UG3SimulatedInput::loadBuffer(void * destBuffer, int maxBytestoRead){
         }
     }
     waveIndex = (waveIndex + 1) % channelsX;
+}
+
+
+void UG3SimulatedInput::makeSine(){
+    for(int sampleIndex = 0; sampleIndex < samples; sampleIndex++) {
+        for(int y = 0; y < channelsY; y++) {
+            for(int x = 0; x < channelsX; x++) {
+                float radian = simPi*2*sampleIndex/(samples*sinePhaseShiftConstant)+simPi*2*waveIndex/sinePhaseShiftConstant;
+                float sinVal = sin(radian);
+                simulatedValues[x + y*channelsX + channelsX*channelsY * sampleIndex] = sinVal * 5000 + 5000;
+              
+            }
+        }
+    }
+    waveIndex = (waveIndex + 1) % sinePhaseShiftConstant;
+}
+
+bool UG3SimulatedInput::loadBuffer(void * destBuffer, int maxBytestoRead){
+    makeColorWave();
     memcpy((uint16_t*)destBuffer, simulatedValues, maxBytestoRead);
     return true;
 }

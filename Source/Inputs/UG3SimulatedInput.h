@@ -24,14 +24,19 @@ public:
      the entire color theme's spectrum**/
     bool loadBuffer(void * destBuffer, int maxBytestoRead) override;
     
+    void makeColorWave();
+    void makeSine();
+    
 private:
+    float const simPi = 3.1415;
+    int const sinePhaseShiftConstant = 1024;
     uint16_t *simulatedValues;
     int channelsX;
     int channelsY;
     int counter;
     int samples;
     unsigned long long maxValue;
-    uint8_t waveIndex = 0;
+    int waveIndex = 0;
 };
 }
 #endif /* UG3SimulatedInput_h */

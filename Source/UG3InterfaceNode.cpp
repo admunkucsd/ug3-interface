@@ -200,7 +200,6 @@ void UG3InterfaceNode::updateSettings(OwnedArray<ContinuousChannel>* continuousC
 
 bool UG3InterfaceNode::foundInputSource()
 {
-    std::cout << "connected: " << connected << std::endl;
     return connected;
 }
 
@@ -300,11 +299,9 @@ void UG3InterfaceNode::changeInput(int index) {
     String inputName = getInputNames()[index];
     if(String("Simulated") == inputName) {
         input = new UG3SimulatedInput(num_channels_x, num_channels_y, num_samp, getInputMaxValue());
-        std::cout << "Instancing Simulated Input" <<std::endl;
     }
     else if (String("Socket") == inputName) {
         input = new UG3Socket(port);
-        std::cout << "Instancing Socket Input" <<std::endl;
 
     }
     //FIXME: changed to input -> connected() when actually using Socket (connected needs to be True or a reload callback will continually be called)
