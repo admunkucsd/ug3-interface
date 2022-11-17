@@ -15,6 +15,8 @@ namespace UG3Interface {
 class UG3Input {
 public:
     
+    UG3Input(bool& connected);
+    
     /** Returns true if the input is able to connect to the source */
     virtual ~UG3Input() = default;
     
@@ -39,7 +41,8 @@ public:
    
     virtual void saveCustomParametersToXml(XmlElement* parameters) = 0;
     virtual void loadCustomParametersFromXml(XmlElement* parameters) = 0;
-     
+    protected:
+        bool& connected;
 };
 
 }

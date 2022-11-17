@@ -9,7 +9,7 @@
 
 using namespace UG3Interface;
 
-UG3Socket::UG3Socket(bool connected, int port, float sampleRate) : port(port), sampleRate(sampleRate){
+UG3Socket::UG3Socket(bool& connected, int port, float sampleRate) : port(port), sampleRate(sampleRate), UG3Input(connected){
     // Add connect button
     connectButton = new UtilityButton("CONNECT", Font("Small Text", 12, Font::bold));
     connectButton->setRadius(3.0f);

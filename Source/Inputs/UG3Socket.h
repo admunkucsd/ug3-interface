@@ -16,7 +16,7 @@
 namespace UG3Interface {
 class UG3Socket : public UG3Input {
 public:
-    UG3Socket(bool connected, int port=9001, float sampleRate=30000.0);
+    UG3Socket(bool& connected, int port=9001, float sampleRate=30000.0);
     ~UG3Socket() override;
     bool connect() override;
     bool reconnect() override;
