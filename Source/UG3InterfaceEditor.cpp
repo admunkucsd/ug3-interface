@@ -14,28 +14,7 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
 
     desiredWidth = 400;
 
-    // Add connect button
-    connectButton = new UtilityButton("CONNECT", Font("Small Text", 12, Font::bold));
-    connectButton->setRadius(3.0f);
-    connectButton->setBounds(301, 35, 70, 20);
-    connectButton->addListener(this);
-    addAndMakeVisible(connectButton);
-
-    // Port
-    portLabel = new Label("Port", "Port");
-    portLabel->setFont(Font("Small Text", 10, Font::plain));
-    portLabel->setBounds(296, 60, 65, 8);
-    portLabel->setColour(Label::textColourId, Colours::darkgrey);
-    addAndMakeVisible(portLabel);
-
-    portInput = new Label("Port", String(node->port));
-    portInput->setFont(Font("Small Text", 10, Font::plain));
-    portInput->setColour(Label::backgroundColourId, Colours::lightgrey);
-    portInput->setEditable(true);
-    portInput->addListener(this);
-    portInput->setBounds(301, 70, 65, 15);
-    addAndMakeVisible(portInput);
-
+    
     //---
     bufferSizeMainLabel = new Label("BUFFER SIZE", "BUFFER SIZE");
     bufferSizeMainLabel->setFont(Font("Small Text", 12, Font::plain));
@@ -80,21 +59,6 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
     bufferSizeInput->addListener(this);
     addAndMakeVisible(bufferSizeInput);
 
-    // Fs
-    sampleRateLabel = new Label("FREQ (HZ)", "FREQ (HZ)");
-    sampleRateLabel->setFont(Font("Small Text", 10, Font::plain));
-    sampleRateLabel->setBounds(296, 92, 85, 8);
-    sampleRateLabel->setColour(Label::textColourId, Colours::darkgrey);
-    addAndMakeVisible(sampleRateLabel);
-
-    sampleRateInput = new Label("Fs (Hz)", String((int) node->sample_rate));
-    sampleRateInput->setFont(Font("Small Text", 10, Font::plain));
-    sampleRateInput->setBounds(301, 105, 65, 15);
-    sampleRateInput->setEditable(true);
-    sampleRateInput->setColour(Label::backgroundColourId, Colours::lightgrey);
-    sampleRateInput->addListener(this);
-    addAndMakeVisible(sampleRateInput);
-
     //---
 
     // Scale
@@ -138,8 +102,14 @@ UG3InterfaceEditor::UG3InterfaceEditor(GenericProcessor* parentNode, UG3Interfac
     inputSelector->setBounds (11, 60, 120, 20);
     inputSelector->addListener (this);
     addAndMakeVisible (inputSelector);
-    
+
     populateInputs();
+    
+    node->bindInputActionComponentsToEditor(this);
+    
+    for(Component* inputEditorComponent: node->getInputEditorComponents()) {
+        addAndMakeVisible(inputEditorComponent);
+    }
 
 }
 
@@ -162,32 +132,6 @@ void UG3InterfaceEditor::labelTextChanged(Label* label)
             channelCountInput->setText(String(node->num_channels), dontSendNotification);
         }
         
-    }
-    else if (label == sampleRateInput)
-    {
-        float sampleRate = sampleRateInput->getText().getFloatValue();
-
-        if (sampleRate > 0 && sampleRate < 50000.0f)
-        {
-            node->sample_rate = sampleRate;
-            CoreServices::updateSignalChain(this);
-        }
-        else {
-            sampleRateInput->setText(String(node->sample_rate), dontSendNotification);
-        }
-        
-    }
-    else if (label == portInput)
-    {
-        int port = portInput->getText().getIntValue();
-
-        if (port > 1023 && port < 65535)
-        {
-            node->port = port;
-        }
-        else {
-            portInput->setText(String(node->port), dontSendNotification);
-        }
     }
     else if (label == bufferSizeInput)
     {
@@ -225,19 +169,23 @@ void UG3InterfaceEditor::labelTextChanged(Label* label)
             offsetInput->setText(String(node->data_offset), dontSendNotification);
         }
     }
+    else if (node->onInputLabelChanged(label)) {
+        CoreServices::updateSignalChain(this);
+    }
 }
 
 void UG3InterfaceEditor::startAcquisition()
 {
     // Disable the whole gui
-    portInput->setEnabled(false);
     channelCountInput->setEnabled(false);
-    sampleRateInput->setEnabled(false);
     bufferSizeInput->setEnabled(false);
     scaleInput->setEnabled(false);
     offsetInput->setEnabled(false);
-    connectButton->setEnabled(false);
     inputSelector->setEnabled(false);
+    for(Component* inputEditorComponent: node->getInputEditorComponents()) {
+        inputEditorComponent->setEnabled(false);
+    }
+    
 
     // Set the channels etc
     node->data_scale = scaleInput->getText().getFloatValue();
@@ -250,32 +198,42 @@ void UG3InterfaceEditor::startAcquisition()
 void UG3InterfaceEditor::stopAcquisition()
 {
     // Reenable the whole gui
-    portInput->setEnabled(true);
     channelCountInput->setEnabled(true);
-    sampleRateInput->setEnabled(true);
     bufferSizeInput->setEnabled(true);
     scaleInput->setEnabled(true);
     offsetInput->setEnabled(true);
-    connectButton->setEnabled(true);
     inputSelector->setEnabled(true);
-
+    for(Component* inputEditorComponent: node->getInputEditorComponents()) {
+        inputEditorComponent->setEnabled(true);
+    }
     disable();
 }
 
 void UG3InterfaceEditor::buttonClicked(Button* button)
 {
 
-    if (button == connectButton)
-    {
-        node->port = portInput->getText().getIntValue();
-        node->tryToConnect();
+    if (node->onInputButtonPressed(button)) {
+        CoreServices::updateSignalChain(this);
     }
   
 }
 
 void UG3InterfaceEditor::comboBoxChanged (ComboBox* combo){
-    node->changeInput(combo->getSelectedId() - 1);
-    CoreServices::updateSignalChain (this);
+    if(combo == inputSelector) {
+        for(Component* inputEditorComponent: node->getInputEditorComponents()) {
+            removeChildComponent(inputEditorComponent);
+        }
+        node->changeInput(combo->getSelectedId() - 1);
+        node->bindInputActionComponentsToEditor(this);
+        for(Component* inputEditorComponent: node->getInputEditorComponents()) {
+            addAndMakeVisible(inputEditorComponent);
+        }
+        CoreServices::updateSignalChain (this);
+    }
+    else if (node->onInputComboBoxChanged(combo)) {
+        CoreServices::updateSignalChain(this);
+
+    }
 }
 
 void UG3InterfaceEditor::populateInputs ()
@@ -299,12 +257,11 @@ void UG3InterfaceEditor::saveCustomParametersToXml(XmlElement* xmlNode)
 {
     XmlElement* parameters = xmlNode->createNewChildElement("PARAMETERS");
 
-    parameters->setAttribute("port", portInput->getText());
     parameters->setAttribute("numchan", channelCountInput->getText());
     parameters->setAttribute("numsamp", bufferSizeInput->getText());
-    parameters->setAttribute("fs", sampleRateInput->getText());
     parameters->setAttribute("scale", scaleInput->getText());
     parameters->setAttribute("offset", offsetInput->getText());
+    node->saveInputCustomParametersToXml(parameters);
 }
 
 void UG3InterfaceEditor::loadCustomParametersFromXml(XmlElement* xmlNode)
@@ -313,8 +270,6 @@ void UG3InterfaceEditor::loadCustomParametersFromXml(XmlElement* xmlNode)
     {
         if (subNode->hasTagName("PARAMETERS"))
         {
-            portInput->setText(subNode->getStringAttribute("port", ""), dontSendNotification);
-            node->port = subNode->getIntAttribute("port", DEFAULT_PORT);
 
             channelCountInput->setText(subNode->getStringAttribute("numchan", ""), dontSendNotification);
             node->num_channels = subNode->getIntAttribute("numchan", DEFAULT_NUM_CHANNELS_X*DEFAULT_NUM_CHANNELS_Y);
@@ -322,14 +277,14 @@ void UG3InterfaceEditor::loadCustomParametersFromXml(XmlElement* xmlNode)
             bufferSizeInput->setText(subNode->getStringAttribute("numsamp", ""), dontSendNotification);
             node->num_samp = subNode->getIntAttribute("numsamp", DEFAULT_NUM_SAMPLES);
 
-            sampleRateInput->setText(subNode->getStringAttribute("fs", ""), dontSendNotification);
-            node->sample_rate = subNode->getDoubleAttribute("fs", DEFAULT_SAMPLE_RATE);
-
             scaleInput->setText(subNode->getStringAttribute("scale", ""), dontSendNotification);
             node->data_scale = subNode->getDoubleAttribute("scale", DEFAULT_DATA_SCALE);
 
             offsetInput->setText(subNode->getStringAttribute("offset", ""), dontSendNotification);
             node->data_offset = subNode->getIntAttribute("offset", DEFAULT_DATA_OFFSET);
+            
+            node->loadInputCustomParametersFromXml(subNode);
+
         }
     }
 }

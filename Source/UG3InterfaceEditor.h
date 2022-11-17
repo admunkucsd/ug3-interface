@@ -6,6 +6,7 @@
 #endif
 
 #include <VisualizerEditorHeaders.h>
+#include <map>
 
 namespace UG3Interface
 {
@@ -53,14 +54,7 @@ namespace UG3Interface
 
 
     private:
-
-        // Button that tried to connect to client
-        ScopedPointer<UtilityButton> connectButton;
-
-        // Port
-        ScopedPointer<Label> portLabel;
-        ScopedPointer<Label> portInput;
-
+        
         // Buffer size
         ScopedPointer<Label> bufferSizeMainLabel;
 
@@ -74,10 +68,6 @@ namespace UG3Interface
         // Samples
         ScopedPointer<Label> bufferSizeLabel;
         ScopedPointer<Label> bufferSizeInput;
-
-        // Fs
-        ScopedPointer<Label> sampleRateLabel;
-        ScopedPointer<Label> sampleRateInput;
 
         // Scale
         ScopedPointer<Label> scaleLabel;

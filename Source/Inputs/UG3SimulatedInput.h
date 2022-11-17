@@ -10,19 +10,33 @@
 
 #include <stdio.h>
 #include <DataThreadHeaders.h>
+#include <vector>
 #include "../UG3InterfaceComponents.h"
 
 namespace UG3Interface {
 class UG3SimulatedInput : public UG3Input {
 public:
-    UG3SimulatedInput(int channelsX = 64, int channelsY = 64, int samples = 10, unsigned long long maxValue = 0xffff);
-    ~UG3SimulatedInput();
+    UG3SimulatedInput(bool& connected, int channelsX = 64, int channelsY = 64, int samples = 10, unsigned long long maxValue = 0xffff);
+    ~UG3SimulatedInput() override;
     bool connect() override;
     bool reconnect() override;
     
     /**loads buffer in such a way that a wave effect is created covering
      the entire color theme's spectrum**/
     bool loadBuffer(void * destBuffer, int maxBytestoRead) override;
+    
+    std::vector<Component*> getEditorComponents() override;
+
+    void bindComboBoxesToEditor(ComboBox::Listener* listener) override;
+    void bindLabelsToEditor(Label::Listener* listener) override;
+    void bindButtonsToEditor(Button::Listener* listener) override;
+    
+    bool onComboBoxChanged(ComboBox * comboBox) override;
+    bool onLabelChanged(Label * label) override;
+    bool onButtonPressed(Button * button) override;
+    
+    void saveCustomParametersToXml(XmlElement* parameters) override;
+    void loadCustomParametersFromXml(XmlElement* parameters) override;
     
     void makeColorWave();
     void makeSine();

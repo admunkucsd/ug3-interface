@@ -10,7 +10,7 @@
 
 using namespace UG3Interface;
 
-UG3SimulatedInput::UG3SimulatedInput(int channelsX, int channelsY, int samples, unsigned long long maxValue): channelsX(channelsX), channelsY(channelsY),  samples(samples), maxValue(maxValue), counter(0){
+UG3SimulatedInput::UG3SimulatedInput(bool& connected, int channelsX, int channelsY, int samples, unsigned long long maxValue): channelsX(channelsX), channelsY(channelsY),  samples(samples), maxValue(maxValue), counter(0){
     simulatedValues = (uint16_t *) malloc(channelsX * channelsY * sizeof(uint16_t) * samples);
     memset(simulatedValues, 0, channelsX*channelsY*sizeof(*simulatedValues)*samples);
 }
@@ -59,3 +59,11 @@ bool UG3SimulatedInput::loadBuffer(void * destBuffer, int maxBytestoRead){
     memcpy((uint16_t*)destBuffer, simulatedValues, maxBytestoRead);
     return true;
 }
+
+void UG3SimulatedInput::bindComboBoxesToEditor(ComboBox::Listener* listener) {}
+void UG3SimulatedInput::bindLabelsToEditor(Label::Listener* listener) {}
+void UG3SimulatedInput::bindButtonsToEditor(Button::Listener* listener) {}
+
+bool UG3SimulatedInput::onComboBoxChanged(ComboBox * comboBox){return false;}
+bool UG3SimulatedInput::onLabelChanged(Label * label){return false;}
+bool UG3SimulatedInput::onButtonPressed(Button * button){return false;}

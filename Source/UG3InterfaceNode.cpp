@@ -4,8 +4,8 @@
 
 #include "UG3InterfaceNode.h"
 
-#include "UG3InterfaceEditor.h"
 #include "UG3InterfaceCanvas.h"
+#include "UG3InterfaceEditor.h"
 
 #include "UG3InterfaceComponents.h"
 #include "Inputs/UG3Socket.h"
@@ -86,19 +86,17 @@ DataThread* UG3InterfaceNode::createDataThread(SourceNode *sn)
 const std::vector<String> UG3InterfaceNode::inputNames = std::vector<String>{"Simulated", "Socket"};
 
 UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
-    port(DEFAULT_PORT),
     num_channels(DEFAULT_NUM_CHANNELS_X*DEFAULT_NUM_CHANNELS_Y),
     num_samp(DEFAULT_NUM_SAMPLES),
     data_offset(DEFAULT_DATA_OFFSET),
     data_scale(DEFAULT_DATA_SCALE),
-    sample_rate(DEFAULT_SAMPLE_RATE),
     num_channels_x(DEFAULT_NUM_CHANNELS_X),
     num_channels_y(DEFAULT_NUM_CHANNELS_Y),
     bitWidth(DEFAULT_CHANNEL_BITWIDTH)
 {
     //FIXME: Use editor ComboBox to determine input
     //input = new UG3Socket(port);
-    input = new UG3SimulatedInput(num_channels_x, num_channels_y, num_samp, getInputMaxValue());
+    input = new UG3SimulatedInput(connected, num_channels_x, num_channels_y, num_samp, getInputMaxValue());
     connected = input->connect();
     sourceBuffers.add(new DataBuffer(num_channels, 10000)); // start with 2 channels and automatically resize
     recvbuf = (uint16_t *) malloc(num_channels * num_samp * 2);
@@ -161,8 +159,6 @@ void UG3InterfaceNode::updateSettings(OwnedArray<ContinuousChannel>* continuousC
         "description",
         "identifier",
 
-        sample_rate
-
     };
 
     sourceStreams->add(new DataStream(settings));
@@ -218,10 +214,6 @@ bool UG3InterfaceNode::startAcquisition()
     return true;
 }
 
-void  UG3InterfaceNode::tryToConnect()
-{
-    connected = input->reconnect();
-}
 
 bool UG3InterfaceNode::stopAcquisition()
 {
@@ -281,7 +273,7 @@ void UG3InterfaceNode::timerCallback()
 {
     //std::cout << "Expected samples: " << int(sample_rate * 5) << ", Actual samples: " << total_samples << std::endl;
     
-    relative_sample_rate = (sample_rate * 5) / float(total_samples);
+    //relative_sample_rate = (sample_rate * 5) / float(total_samples);
 
     //total_samples = 0;
 }
@@ -298,15 +290,44 @@ unsigned long long UG3InterfaceNode::getInputMaxValue() {
 void UG3InterfaceNode::changeInput(int index) {
     String inputName = getInputNames()[index];
     if(String("Simulated") == inputName) {
-        input = new UG3SimulatedInput(num_channels_x, num_channels_y, num_samp, getInputMaxValue());
+        input = new UG3SimulatedInput(connected, num_channels_x, num_channels_y, num_samp, getInputMaxValue());
     }
     else if (String("Socket") == inputName) {
-        input = new UG3Socket(port);
+        input = new UG3Socket(connected, DEFAULT_PORT, DEFAULT_SAMPLE_RATE);
 
     }
     //FIXME: changed to input -> connected() when actually using Socket (connected needs to be True or a reload callback will continually be called)
     //connected = input -> connected():
     connected = true;
 
+}
+
+std::vector<Component*> UG3InterfaceNode::getInputEditorComponents() {
+    return input->getEditorComponents();
+}
+
+void UG3InterfaceNode::bindInputActionComponentsToEditor(UG3InterfaceEditor* editor) {
+    input -> bindLabelsToEditor(dynamic_cast<Label::Listener*>(editor));
+    input -> bindComboBoxesToEditor(dynamic_cast<ComboBox::Listener*>(editor));
+    input -> bindButtonsToEditor(dynamic_cast<Button::Listener*>(editor));
+
+
+}
+
+bool UG3InterfaceNode::onInputLabelChanged(Label * label){
+    return input->onLabelChanged(label);
+}
+bool UG3InterfaceNode::onInputComboBoxChanged(ComboBox * comboBox){
+    return input->onComboBoxChanged(comboBox);
+}
+bool UG3InterfaceNode::onInputButtonPressed(Button * button){
+    return input->onButtonPressed(button);
+}
+
+void UG3InterfaceNode::saveInputCustomParametersToXml(XmlElement* parameters){
+    input->saveCustomParametersToXml(parameters);
+}
+void UG3InterfaceNode::loadInputCustomParametersFromXml(XmlElement* parameters){
+    input->loadCustomParametersFromXml(parameters);
 }
 

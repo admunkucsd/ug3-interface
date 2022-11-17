@@ -15,6 +15,8 @@ namespace UG3Interface
 {
     class UG3Input;
 
+    class UG3InterfaceEditor;
+
     class ActivityDataContainer
     {
     public:
@@ -61,8 +63,7 @@ namespace UG3Interface
         int getNumChannels() const;
 
         // User defined
-        int port;
-        float sample_rate;
+
         float data_scale;
         uint16_t data_offset;
         int num_samp;
@@ -77,7 +78,6 @@ namespace UG3Interface
         uint64 eventState;
 
         void resizeChanSamp();
-        void tryToConnect();
         
         /**Used to calculate the maximum value for a given input bit width**/
         unsigned long long getInputMaxValue();
@@ -92,7 +92,16 @@ namespace UG3Interface
         std::vector<String> getInputNames();
         
         void changeInput(int index);
-
+        std::vector<Component*> getInputEditorComponents();
+        
+        void bindInputActionComponentsToEditor(UG3InterfaceEditor* editor);
+        
+        bool onInputLabelChanged(Label * label);
+        bool onInputComboBoxChanged(ComboBox * comboBox);
+        bool onInputButtonPressed(Button * button);
+        
+        void saveInputCustomParametersToXml(XmlElement* parameters);
+        void loadInputCustomParametersFromXml(XmlElement* parameters);
             
     private:
 
