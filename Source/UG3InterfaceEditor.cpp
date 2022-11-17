@@ -261,7 +261,7 @@ void UG3InterfaceEditor::saveCustomParametersToXml(XmlElement* xmlNode)
     parameters->setAttribute("numsamp", bufferSizeInput->getText());
     parameters->setAttribute("scale", scaleInput->getText());
     parameters->setAttribute("offset", offsetInput->getText());
-    node->saveInputCustomParametersToXml(parameters);
+    //node->saveInputCustomParametersToXml(parameters);
 }
 
 void UG3InterfaceEditor::loadCustomParametersFromXml(XmlElement* xmlNode)
@@ -283,7 +283,7 @@ void UG3InterfaceEditor::loadCustomParametersFromXml(XmlElement* xmlNode)
             offsetInput->setText(subNode->getStringAttribute("offset", ""), dontSendNotification);
             node->data_offset = subNode->getIntAttribute("offset", DEFAULT_DATA_OFFSET);
             
-            node->loadInputCustomParametersFromXml(subNode);
+            //node->loadInputCustomParametersFromXml(subNode);
 
         }
     }

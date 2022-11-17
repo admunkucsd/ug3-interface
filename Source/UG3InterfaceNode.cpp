@@ -95,7 +95,7 @@ UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     bitWidth(DEFAULT_CHANNEL_BITWIDTH)
 {
     //FIXME: Use editor ComboBox to determine input
-    //input = new UG3Socket(port);
+    //input = new UG3Socket(false, 0,0);
     input = new UG3SimulatedInput(connected, num_channels_x, num_channels_y, num_samp, getInputMaxValue());
     connected = input->connect();
     sourceBuffers.add(new DataBuffer(num_channels, 10000)); // start with 2 channels and automatically resize

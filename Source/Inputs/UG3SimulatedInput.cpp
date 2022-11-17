@@ -60,6 +60,11 @@ bool UG3SimulatedInput::loadBuffer(void * destBuffer, int maxBytestoRead){
     return true;
 }
 
+std::vector<Component*> UG3SimulatedInput::getEditorComponents(){
+    std::vector<Component*> returnVector;
+    return returnVector;
+}
+
 void UG3SimulatedInput::bindComboBoxesToEditor(ComboBox::Listener* listener) {}
 void UG3SimulatedInput::bindLabelsToEditor(Label::Listener* listener) {}
 void UG3SimulatedInput::bindButtonsToEditor(Button::Listener* listener) {}
@@ -67,3 +72,10 @@ void UG3SimulatedInput::bindButtonsToEditor(Button::Listener* listener) {}
 bool UG3SimulatedInput::onComboBoxChanged(ComboBox * comboBox){return false;}
 bool UG3SimulatedInput::onLabelChanged(Label * label){return false;}
 bool UG3SimulatedInput::onButtonPressed(Button * button){return false;}
+
+
+
+void UG3SimulatedInput::saveCustomParametersToXml(XmlElement* parameters){}
+void UG3SimulatedInput::loadCustomParametersFromXml(XmlElement* parameters){}
+
+

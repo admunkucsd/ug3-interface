@@ -26,18 +26,20 @@ public:
     
     /** Returns true if the input is able to load data from the source */
     virtual bool loadBuffer(void * destBuffer, int maxBytestoRead) = 0;
+    virtual std::vector<Component*> getEditorComponents() = 0;
     
     virtual void bindComboBoxesToEditor(ComboBox::Listener* listener) = 0;
     virtual void bindLabelsToEditor(Label::Listener* listener) = 0;
     virtual void bindButtonsToEditor(Button::Listener* listener) = 0;
     
-    virtual bool onComboBoxChanged(ComboBox * comboBox);
-    virtual bool onLabelChanged(Label * label);
-    virtual bool onButtonPressed(Button * button);
+    virtual bool onComboBoxChanged(ComboBox * comboBox)=0;
+    virtual bool onLabelChanged(Label * label)=0;
+    virtual bool onButtonPressed(Button * button)=0;
 
-    virtual std::vector<Component*> getEditorComponents() = 0;
+   
     virtual void saveCustomParametersToXml(XmlElement* parameters) = 0;
     virtual void loadCustomParametersFromXml(XmlElement* parameters) = 0;
+     
 };
 
 }

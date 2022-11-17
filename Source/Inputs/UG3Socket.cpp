@@ -81,6 +81,17 @@ bool UG3Socket::loadBuffer(void * destBuffer, int maxBytestoRead){
     return true;
 }
 
+std::vector<Component*> UG3Socket::getEditorComponents(){
+    std::vector<Component*> returnVector;
+    returnVector.push_back(connectButton);
+    returnVector.push_back(portLabel);
+    returnVector.push_back(portInput);
+    returnVector.push_back(sampleRateLabel);
+    returnVector.push_back(sampleRateInput);
+    return returnVector;
+
+}
+
 void UG3Socket::bindComboBoxesToEditor(ComboBox::Listener* listener){}
 
 void UG3Socket::bindLabelsToEditor(Label::Listener* listener){
