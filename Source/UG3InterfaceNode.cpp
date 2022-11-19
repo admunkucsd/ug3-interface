@@ -158,7 +158,7 @@ void UG3InterfaceNode::updateSettings(OwnedArray<ContinuousChannel>* continuousC
         "EphysSocketStream",
         "description",
         "identifier",
-
+        DEFAULT_SAMPLE_RATE
     };
 
     sourceStreams->add(new DataStream(settings));
