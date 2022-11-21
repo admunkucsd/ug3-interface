@@ -30,20 +30,12 @@
 #include "UG3InterfaceNode.h"
 #include "UG3InterfaceEditor.h"
 
+#include "UG3GridDisplay.h"
+
 #include "ColourScheme.h"
 
 using namespace UG3Interface;
 
-void Electrode::setColour(Colour c_)
-{
-    c = c_;
-    //repaint();
-}
-
-void Electrode::paint(Graphics& g)
-{
-    g.fillAll(c);
-}
 
 #pragma mark - UG3InterfaceCanvas -
 
@@ -51,28 +43,15 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, int numChannels
     : node(node_), numChannels(numChannels), inputMaxValue(inputMaxValue)
 {
     refreshRate = 30;
+    
+    viewport = std::make_unique<UG3InterfaceViewport>(this);
 
-    updateDisplayDimensions();
-
-    xDimLabel = std::make_unique<Label>("X Dimension", "X Dimension:");
-    //addAndMakeVisible(xDimLabel.get());
-
-    xDimInput = std::make_unique<Label>("X Dim Input", "64");
-    xDimInput->setEditable(true);
-    xDimInput->setColour(Label::backgroundColourId, Colour(70,70,70));
-    xDimInput->setColour(Label::textColourId, Colours::lightgrey);
-    xDimInput->addListener(this);
-    //addAndMakeVisible(xDimInput.get());
-
-    yDimLabel = std::make_unique<Label>("Y Dimension", "Y Dimension:");
-    //addAndMakeVisible(yDimLabel.get());
-
-    yDimInput = std::make_unique<Label>("Y Dim Input", "64");
-    yDimInput->setEditable(true);
-    yDimInput->setColour(Label::backgroundColourId, Colour(70, 70, 70));
-    yDimInput->setColour(Label::textColourId, Colours::lightgrey);
-    yDimInput->addListener(this);
-    //addAndMakeVisible(yDimInput.get());
+    gridDisplay = std::make_unique<UG3GridDisplay>(this, viewport.get(), numChannels);
+    
+    viewport->setViewedComponent(gridDisplay.get());
+    
+    gridDisplay->updateDisplayDimensions();
+    
 
 }
 
@@ -91,90 +70,14 @@ void UG3InterfaceCanvas::update()
 
 void UG3InterfaceCanvas::labelTextChanged(Label* label)
 {
-    int originalValue;
-    int candidateValue = label->getText().getIntValue();
-
-    if (label == xDimInput.get())
-    {
-        originalValue = numXPixels;
-
-        if (candidateValue > 0 && candidateValue <= 64)
-        {
-            numXPixels = candidateValue;
-            updateDisplayDimensions();
-        }
-        else
-        {
-            label->setText(String(originalValue), dontSendNotification);
-        }
-            
-
-    }
-    else {
-        originalValue = numYPixels;
-
-        if (candidateValue > 0 && candidateValue <= 64)
-        {
-            numYPixels = candidateValue;
-            updateDisplayDimensions();
-        }
-        else
-        {
-            label->setText(String(originalValue), dontSendNotification);
-        }
-            
-    }
 }
 
-
-void UG3InterfaceCanvas::updateDisplayDimensions()
-{
-
-    electrodes.clear();
-
-    const int totalPixels = numXPixels * numYPixels;
-
-    LOGC("Total pixels: ", totalPixels);
-
-    const int LEFT_BOUND = 20;
-    const int TOP_BOUND = 20;
-    const int SPACING = 2;
-    const int NUM_COLUMNS = numXPixels;
-    const int HEIGHT = 8;
-    const int WIDTH = 8;
-
-    for (int i = 0; i < totalPixels; i++)
-    {
-        Electrode* e = new Electrode();
-
-        int column = i % NUM_COLUMNS;
-        int row = i / NUM_COLUMNS;
-        int L = LEFT_BOUND + column * (WIDTH + SPACING);
-        int T = TOP_BOUND + row * (HEIGHT + SPACING);
-
-        e->setBounds(L,
-            T,
-            WIDTH,
-            HEIGHT);
-
-        addAndMakeVisible(e);
-        electrodes.add(e);
-    }
-
-}
 
 void UG3InterfaceCanvas::refresh()
 {
     const float* peakToPeakValues = node->getLatestValues();
 
-    //std::cout << "Refresh." << std::endl;
-
-    int maxChan = jmin(electrodes.size(), numChannels);
-
-    for (int i = 0; i < maxChan; i++)
-    {
-        electrodes[i]->setColour(ColourScheme::getColourForNormalizedValue((float)(peakToPeakValues[i] / inputMaxValue)));
-    }
+    gridDisplay->refresh(peakToPeakValues, inputMaxValue);
 
     repaint();
 }
@@ -193,29 +96,6 @@ void UG3InterfaceCanvas::endAnimation()
     stopCallbacks();
 }
 
-
-void UG3InterfaceCanvas::updateDataStream(DataStream* stream)
-{
-
-    std::cout << "Canvas updating stream to " << stream->getName() << std::endl;
-
-    numChannels = stream->getChannelCount();
-
-    if (numChannels > 4096)
-        numChannels = 4096;
-
-    for (int i = 0; i < electrodes.size(); i++)
-    {
-        if (i < numChannels)
-            electrodes[i]->setColour(Colours::grey);
-        else
-            electrodes[i]->setColour(Colours::black);
-    }
-        
-
-    repaint();
-}
-
 void UG3InterfaceCanvas::paint(Graphics &g)
 {
 
@@ -224,10 +104,6 @@ void UG3InterfaceCanvas::paint(Graphics &g)
 
 void UG3InterfaceCanvas::resized()
 {
-    xDimLabel->setBounds(100, getHeight() - 50, 100, 20);
-    xDimInput->setBounds(200, getHeight() - 50, 50, 20);
-    yDimLabel->setBounds(300, getHeight() - 50, 100, 20);
-    yDimInput->setBounds(400, getHeight() - 50, 50, 20);
 }
 
 #pragma mark - UG3InterfaceViewport -

@@ -28,18 +28,7 @@
 
 namespace UG3Interface {
 
-class Electrode : public Component
-{
-public:
-    Electrode() : c(Colours::grey) { }
-
-    void setColour(Colour c);
-
-    void paint(Graphics& g);
-
-private:
-    Colour c;
-};
+class UG3GridDisplay;
 
 class UG3InterfaceCanvas : public Visualizer,
     public Label::Listener
@@ -84,22 +73,12 @@ public:
     /** Custom method for updating settings */
     void updateDataStream(DataStream* stream);
 
-    /** Update electrode display dimensions */
-    void updateDisplayDimensions();
 
 private:
     class UG3InterfaceNode* node;
 
-    ScopedPointer<class UG3InterfaceViewport> viewport;
-    OwnedArray<Electrode> electrodes;
-
-    std::unique_ptr<Label> xDimInput;
-    std::unique_ptr<Label> xDimLabel;
-    std::unique_ptr<Label> yDimInput;
-    std::unique_ptr<Label> yDimLabel;
-
-    int numXPixels = 64;
-    int numYPixels = 64;
+    std::unique_ptr<class UG3InterfaceViewport> viewport;
+    std::unique_ptr<UG3GridDisplay> gridDisplay;
 
     int numChannels;
     unsigned long long inputMaxValue;
