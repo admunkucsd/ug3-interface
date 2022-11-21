@@ -10,9 +10,31 @@
 
 using namespace UG3Interface;
 
+
 UG3SimulatedInput::UG3SimulatedInput(bool& connected, int channelsX, int channelsY, int samples, unsigned long long maxValue): channelsX(channelsX), channelsY(channelsY),  samples(samples), maxValue(maxValue), counter(0), UG3Input(connected){
     simulatedValues = (uint16_t *) malloc(channelsX * channelsY * sizeof(uint16_t) * samples);
     memset(simulatedValues, 0, channelsX*channelsY*sizeof(*simulatedValues)*samples);
+    
+    simulationOptions["Sine Wave"] = [this](){makeSine();};
+    simulationOptions["Color Wave"] = [this](){makeColorWave();};
+    simulationSelector = new ComboBox ("Simulation Selector");
+    simulationSelector->setBounds (301, 60, 100, 20);
+    
+    simulationLabel = new Label ("Simulation", "Simulation");
+    simulationLabel -> setFont(Font("Small Text", 10, Font::plain));
+    simulationLabel->setBounds (295, 48, 65, 8);
+    simulationLabel->setColour(Label::textColourId, Colours::darkgrey);
+
+    int i = 0;
+    for (auto input : simulationOptions)
+    {
+        simulationSelector->addItem(input.first, i + 1);
+        if(i == 0)
+            simulationSelection = input.first;
+        i++;
+    }
+    simulationSelector->setSelectedId (1, dontSendNotification);
+    
 }
 UG3SimulatedInput::~UG3SimulatedInput(){
     free(simulatedValues);
@@ -55,21 +77,32 @@ void UG3SimulatedInput::makeSine(){
 }
 
 bool UG3SimulatedInput::loadBuffer(void * destBuffer, int maxBytestoRead){
-    makeColorWave();
+    simulationOptions[simulationSelection]();
     memcpy((uint16_t*)destBuffer, simulatedValues, maxBytestoRead);
     return true;
 }
 
 std::vector<Component*> UG3SimulatedInput::getEditorComponents(){
     std::vector<Component*> returnVector;
+    returnVector.push_back(simulationSelector);
+    returnVector.push_back(simulationLabel);
     return returnVector;
 }
 
-void UG3SimulatedInput::bindComboBoxesToEditor(ComboBox::Listener* listener) {}
+void UG3SimulatedInput::bindComboBoxesToEditor(ComboBox::Listener* listener) {
+    simulationSelector -> addListener(listener);
+}
 void UG3SimulatedInput::bindLabelsToEditor(Label::Listener* listener) {}
 void UG3SimulatedInput::bindButtonsToEditor(Button::Listener* listener) {}
 
-bool UG3SimulatedInput::onComboBoxChanged(ComboBox * comboBox){return false;}
+bool UG3SimulatedInput::onComboBoxChanged(ComboBox * comboBox){
+    if(comboBox == simulationSelector) {
+        simulationSelection = comboBox->getText();
+        waveIndex = 0;
+    }
+    return false;
+    
+}
 bool UG3SimulatedInput::onLabelChanged(Label * label){return false;}
 bool UG3SimulatedInput::onButtonPressed(Button * button){return false;}
 

@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <DataThreadHeaders.h>
 #include <vector>
+#include <functional>
+#include <map>
 #include "../UG3InterfaceComponents.h"
 
 namespace UG3Interface {
@@ -42,6 +44,13 @@ public:
     void makeSine();
     
 private:
+    
+    std::map<String, std::function<void()>> simulationOptions;
+    
+    ScopedPointer<ComboBox> simulationSelector;
+    ScopedPointer<Label>    simulationLabel;
+
+    String simulationSelection;
     float const simPi = 3.1415;
     int const sinePhaseShiftConstant = 1024;
     uint16_t *simulatedValues;
