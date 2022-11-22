@@ -38,17 +38,43 @@ public:
 private:
     ScopedPointer<DatagramSocket> socket;
     
+    class UG3SocketUI{
+    public:
+        UG3SocketUI(UG3Socket* socket);
+        
+        std::vector<Component*> getComponents();
+        
+        void bindComboBoxesToEditor(ComboBox::Listener* listener);
+        void bindLabelsToEditor(Label::Listener* listener);
+        void bindButtonsToEditor(Button::Listener* listener);
+        
+        bool onComboBoxChanged(ComboBox * comboBox);
+        bool onLabelChanged(Label * label);
+        bool onButtonPressed(Button * button);
+        
+        void saveCustomParametersToXml(XmlElement* parameters);
+        void loadCustomParametersFromXml(XmlElement* parameters);
+        
+    private:
+        //Editor Components
+        ScopedPointer<UtilityButton> connectButton;
+        ScopedPointer<Label> portLabel;
+        ScopedPointer<Label> portInput;
+        ScopedPointer<Label> sampleRateLabel;
+        ScopedPointer<Label> sampleRateInput;
+        UG3Socket* socket;
+        
+        
+    };
+    
+    ScopedPointer<UG3SocketUI> ui;
+    
     //Component Data Members
     int port;
     float sampleRate;
     bool connected;
     
-    //Editor Components
-    ScopedPointer<UtilityButton> connectButton;
-    ScopedPointer<Label> portLabel;
-    ScopedPointer<Label> portInput;
-    ScopedPointer<Label> sampleRateLabel;
-    ScopedPointer<Label> sampleRateInput;
+
     
 };
 }

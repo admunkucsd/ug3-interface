@@ -45,11 +45,33 @@ public:
     
 private:
     
+    class UG3SimulatedInputUI {
+    public:
+        UG3SimulatedInputUI(UG3SimulatedInput* simulator);
+        
+        std::vector<Component*> getComponents();
+        
+        void bindComboBoxesToEditor(ComboBox::Listener* listener);
+        void bindLabelsToEditor(Label::Listener* listener);
+        void bindButtonsToEditor(Button::Listener* listener);
+        
+        bool onComboBoxChanged(ComboBox * comboBox);
+        bool onLabelChanged(Label * label);
+        bool onButtonPressed(Button * button);
+        
+        void saveCustomParametersToXml(XmlElement* parameters);
+        void loadCustomParametersFromXml(XmlElement* parameters);
+        
+    private:
+        UG3SimulatedInput* simulator;
+        ScopedPointer<ComboBox> simulationSelector;
+        ScopedPointer<Label>    simulationLabel;
+    };
+    
     std::map<String, std::function<void()>> simulationOptions;
     
-    ScopedPointer<ComboBox> simulationSelector;
-    ScopedPointer<Label>    simulationLabel;
-
+    ScopedPointer<UG3SimulatedInputUI> ui;
+    
     String simulationSelection;
     float const simPi = 3.1415;
     int const sinePhaseShiftConstant = 1024;

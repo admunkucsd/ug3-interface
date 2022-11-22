@@ -9,7 +9,7 @@
 
 using namespace UG3Interface;
 
-UG3Socket::UG3Socket(bool& connected, int port, float sampleRate) : port(port), sampleRate(sampleRate), UG3Input(connected){
+UG3Socket::UG3SocketUI::UG3SocketUI(UG3Socket* socket): socket(socket){
     // Add connect button
     connectButton = new UtilityButton("CONNECT", Font("Small Text", 12, Font::bold));
     connectButton->setRadius(3.0f);
@@ -21,7 +21,7 @@ UG3Socket::UG3Socket(bool& connected, int port, float sampleRate) : port(port), 
     portLabel->setBounds(296, 60, 65, 8);
     portLabel->setColour(Label::textColourId, Colours::darkgrey);
 
-    portInput = new Label("Port Input", String(port));
+    portInput = new Label("Port Input", String(socket->port));
     portInput->setFont(Font("Small Text", 10, Font::plain));
     portInput->setColour(Label::backgroundColourId, Colours::lightgrey);
     portInput->setEditable(true);
@@ -33,11 +33,94 @@ UG3Socket::UG3Socket(bool& connected, int port, float sampleRate) : port(port), 
     sampleRateLabel->setBounds(296, 92, 85, 8);
     sampleRateLabel->setColour(Label::textColourId, Colours::darkgrey);
 
-    sampleRateInput = new Label("Sample Rate Input", String(int(sampleRate)));
+    sampleRateInput = new Label("Sample Rate Input", String(int(socket->sampleRate)));
     sampleRateInput->setFont(Font("Small Text", 10, Font::plain));
     sampleRateInput->setBounds(301, 105, 65, 15);
     sampleRateInput->setEditable(true);
     sampleRateInput->setColour(Label::backgroundColourId, Colours::lightgrey);
+}
+
+std::vector<Component*> UG3Socket::UG3SocketUI::getComponents(){
+    std::vector<Component*> returnVector;
+    returnVector.push_back(connectButton);
+    returnVector.push_back(portLabel);
+    returnVector.push_back(portInput);
+    returnVector.push_back(sampleRateLabel);
+    returnVector.push_back(sampleRateInput);
+    return returnVector;
+
+}
+
+void UG3Socket::UG3SocketUI::bindComboBoxesToEditor(ComboBox::Listener* listener){}
+
+void UG3Socket::UG3SocketUI::bindLabelsToEditor(Label::Listener* listener){
+    portInput->addListener(listener);
+    sampleRateInput->addListener(listener);
+
+}
+
+void UG3Socket::UG3SocketUI::bindButtonsToEditor(Button::Listener* listener){
+    connectButton->addListener(listener);
+}
+
+bool UG3Socket::UG3SocketUI::onLabelChanged(Label * label){
+    if (label == sampleRateInput)
+    {
+        float inSampleRate = sampleRateInput->getText().getFloatValue();
+        
+        if (inSampleRate > 0 && inSampleRate < 50000.0f)
+        {
+            socket->sampleRate = inSampleRate;
+        }
+        else {
+            sampleRateInput->setText(String(socket->sampleRate), dontSendNotification);
+        }
+        return true;
+        
+    }
+    else if (label == portInput)
+    {
+        int inPort = portInput->getText().getIntValue();
+        
+        if (inPort > 1023 && inPort < 65535)
+        {
+            socket->port = inPort;
+        }
+        else {
+            portInput->setText(String(socket->port), dontSendNotification);
+        }
+        return false;
+    }
+    return false;
+    
+}
+
+bool UG3Socket::UG3SocketUI::onComboBoxChanged(ComboBox *comboBox){
+    return false;
+}
+
+bool UG3Socket::UG3SocketUI::onButtonPressed(Button *button){
+    
+    if (button == connectButton)
+    {
+        socket->port = portInput->getText().getIntValue();
+        socket->reconnect();
+    }
+    return false;
+}
+
+
+void UG3Socket::UG3SocketUI::saveCustomParametersToXml(XmlElement* parameters){
+    parameters->setAttribute("port", portInput->getText());
+    parameters->setAttribute("fs", sampleRateInput->getText());
+}
+void UG3Socket::UG3SocketUI::loadCustomParametersFromXml(XmlElement* parameters){
+    portInput->setText(parameters->getStringAttribute("port", ""), dontSendNotification);
+    sampleRateInput->setText(parameters->getStringAttribute("fs", ""), dontSendNotification);
+}
+
+UG3Socket::UG3Socket(bool& connected, int port, float sampleRate) : port(port), sampleRate(sampleRate), UG3Input(connected){
+    ui = new UG3SocketUI(this);
     
 }
 UG3Socket::~UG3Socket(){}
@@ -82,83 +165,41 @@ bool UG3Socket::loadBuffer(void * destBuffer, int maxBytestoRead){
 }
 
 std::vector<Component*> UG3Socket::getEditorComponents(){
-    std::vector<Component*> returnVector;
-    returnVector.push_back(connectButton);
-    returnVector.push_back(portLabel);
-    returnVector.push_back(portInput);
-    returnVector.push_back(sampleRateLabel);
-    returnVector.push_back(sampleRateInput);
-    return returnVector;
-
+    return ui->getComponents();
 }
 
-void UG3Socket::bindComboBoxesToEditor(ComboBox::Listener* listener){}
+void UG3Socket::bindComboBoxesToEditor(ComboBox::Listener* listener){
+    ui->bindComboBoxesToEditor(listener);
+}
 
 void UG3Socket::bindLabelsToEditor(Label::Listener* listener){
-    portInput->addListener(listener);
-    sampleRateInput->addListener(listener);
-
+    ui->bindLabelsToEditor(listener);
 }
 
 void UG3Socket::bindButtonsToEditor(Button::Listener* listener){
-    connectButton->addListener(listener);
+    ui->bindButtonsToEditor(listener);
 }
 
+
+
 bool UG3Socket::onLabelChanged(Label * label){
-    if (label == sampleRateInput)
-    {
-        float inSampleRate = sampleRateInput->getText().getFloatValue();
-        
-        if (inSampleRate > 0 && inSampleRate < 50000.0f)
-        {
-            sampleRate = inSampleRate;
-        }
-        else {
-            sampleRateInput->setText(String(sampleRate), dontSendNotification);
-        }
-        return true;
-        
-    }
-    else if (label == portInput)
-    {
-        int inPort = portInput->getText().getIntValue();
-        
-        if (inPort > 1023 && inPort < 65535)
-        {
-            port = inPort;
-        }
-        else {
-            portInput->setText(String(port), dontSendNotification);
-        }
-        return false;
-    }
-    return false;
-    
+    return ui->onLabelChanged(label);
 }
 
 bool UG3Socket::onComboBoxChanged(ComboBox *comboBox){
-    return false;
+    return ui->onComboBoxChanged(comboBox);
 }
 
 bool UG3Socket::onButtonPressed(Button *button){
-    
-    if (button == connectButton)
-    {
-        port = portInput->getText().getIntValue();
-        reconnect();
-    }
-    return false;
+    return ui->onButtonPressed(button);
 }
 
 void UG3Socket::saveCustomParametersToXml(XmlElement* parameters){
-    parameters->setAttribute("port", portInput->getText());
-    parameters->setAttribute("fs", sampleRateInput->getText());
+    ui->saveCustomParametersToXml(parameters);
 }
 void UG3Socket::loadCustomParametersFromXml(XmlElement* parameters){
-    portInput->setText(parameters->getStringAttribute("port", ""), dontSendNotification);
+    ui->loadCustomParametersFromXml(parameters);
     port = parameters->getIntAttribute("port", port);
-    
-    sampleRateInput->setText(parameters->getStringAttribute("fs", ""), dontSendNotification);
     sampleRate = parameters->getDoubleAttribute("fs", sampleRate);
 }
 
