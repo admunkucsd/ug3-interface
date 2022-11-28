@@ -40,13 +40,19 @@ UG3Socket::UG3SocketUI::UG3SocketUI(UG3Socket* socket): socket(socket){
     sampleRateInput->setColour(Label::backgroundColourId, Colours::lightgrey);
 }
 
-std::vector<Component*> UG3Socket::UG3SocketUI::getComponents(){
+std::vector<Component*> UG3Socket::UG3SocketUI::getEditorComponents(){
     std::vector<Component*> returnVector;
     returnVector.push_back(connectButton);
     returnVector.push_back(portLabel);
     returnVector.push_back(portInput);
     returnVector.push_back(sampleRateLabel);
     returnVector.push_back(sampleRateInput);
+    return returnVector;
+
+}
+
+std::vector<Component*> UG3Socket::UG3SocketUI::getCanvasComponents(){
+    std::vector<Component*> returnVector;
     return returnVector;
 
 }
@@ -62,6 +68,10 @@ void UG3Socket::UG3SocketUI::bindLabelsToEditor(Label::Listener* listener){
 void UG3Socket::UG3SocketUI::bindButtonsToEditor(Button::Listener* listener){
     connectButton->addListener(listener);
 }
+
+void UG3Socket::UG3SocketUI::bindComboBoxesToCanvas(ComboBox::Listener* listener){}
+void UG3Socket::UG3SocketUI::bindLabelsToCanvas(Label::Listener* listener){}
+void UG3Socket::UG3SocketUI::bindButtonsToCanvas(Button::Listener* listener){}
 
 bool UG3Socket::UG3SocketUI::onLabelChanged(Label * label){
     if (label == sampleRateInput)
@@ -165,7 +175,11 @@ bool UG3Socket::loadBuffer(void * destBuffer, int maxBytestoRead){
 }
 
 std::vector<Component*> UG3Socket::getEditorComponents(){
-    return ui->getComponents();
+    return ui->getEditorComponents();
+}
+
+std::vector<Component*> UG3Socket::getCanvasComponents(){
+    return ui->getCanvasComponents();
 }
 
 void UG3Socket::bindComboBoxesToEditor(ComboBox::Listener* listener){
@@ -180,7 +194,15 @@ void UG3Socket::bindButtonsToEditor(Button::Listener* listener){
     ui->bindButtonsToEditor(listener);
 }
 
-
+void UG3Socket::bindComboBoxesToCanvas(ComboBox::Listener* listener){
+    ui->bindComboBoxesToCanvas(listener);
+}
+void UG3Socket::bindLabelsToCanvas(Label::Listener* listener){
+    ui->bindLabelsToCanvas(listener);
+}
+void UG3Socket::bindButtonsToCanvas(Button::Listener* listener){
+    ui->bindButtonsToCanvas(listener);
+}
 
 bool UG3Socket::onLabelChanged(Label * label){
     return ui->onLabelChanged(label);

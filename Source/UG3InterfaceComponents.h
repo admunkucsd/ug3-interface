@@ -29,10 +29,16 @@ public:
     /** Returns true if the input is able to load data from the source */
     virtual bool loadBuffer(void * destBuffer, int maxBytestoRead) = 0;
     virtual std::vector<Component*> getEditorComponents() = 0;
+    virtual std::vector<Component*> getCanvasComponents() = 0;
+
     
     virtual void bindComboBoxesToEditor(ComboBox::Listener* listener) = 0;
     virtual void bindLabelsToEditor(Label::Listener* listener) = 0;
     virtual void bindButtonsToEditor(Button::Listener* listener) = 0;
+    
+    virtual void bindComboBoxesToCanvas(ComboBox::Listener* listener) = 0;
+    virtual void bindLabelsToCanvas(Label::Listener* listener) = 0;
+    virtual void bindButtonsToCanvas(Button::Listener* listener) = 0;
     
     virtual bool onComboBoxChanged(ComboBox * comboBox)=0;
     virtual bool onLabelChanged(Label * label)=0;

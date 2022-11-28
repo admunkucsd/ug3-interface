@@ -23,10 +23,15 @@ public:
     bool loadBuffer(void * destBuffer, int maxBytestoRead) override;
     
     std::vector<Component*> getEditorComponents() override;
-        
+    std::vector<Component*> getCanvasComponents() override;
+
     void bindComboBoxesToEditor(ComboBox::Listener* listener) override;
     void bindLabelsToEditor(Label::Listener* listener) override;
     void bindButtonsToEditor(Button::Listener* listener) override;
+    
+    void bindComboBoxesToCanvas(ComboBox::Listener* listener) override;
+    void bindLabelsToCanvas(Label::Listener* listener) override;
+    void bindButtonsToCanvas(Button::Listener* listener) override;
     
     bool onComboBoxChanged(ComboBox * comboBox) override;
     bool onLabelChanged(Label * label) override;
@@ -42,11 +47,16 @@ private:
     public:
         UG3SocketUI(UG3Socket* socket);
         
-        std::vector<Component*> getComponents();
+        std::vector<Component*> getEditorComponents();
+        std::vector<Component*> getCanvasComponents();
         
         void bindComboBoxesToEditor(ComboBox::Listener* listener);
         void bindLabelsToEditor(Label::Listener* listener);
         void bindButtonsToEditor(Button::Listener* listener);
+        
+        void bindComboBoxesToCanvas(ComboBox::Listener* listener);
+        void bindLabelsToCanvas(Label::Listener* listener);
+        void bindButtonsToCanvas(Button::Listener* listener);
         
         bool onComboBoxChanged(ComboBox * comboBox);
         bool onLabelChanged(Label * label);

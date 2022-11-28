@@ -314,6 +314,13 @@ void UG3InterfaceNode::bindInputActionComponentsToEditor(UG3InterfaceEditor* edi
 
 }
 
+void UG3InterfaceNode::bindInputActionComponentsToCanvas(UG3InterfaceCanvas* canvas) {
+    input -> bindLabelsToCanvas(dynamic_cast<Label::Listener*>(canvas));
+    input -> bindComboBoxesToCanvas(dynamic_cast<ComboBox::Listener*>(canvas));
+    input -> bindButtonsToCanvas(dynamic_cast<Button::Listener*>(canvas));
+}
+
+
 bool UG3InterfaceNode::onInputLabelChanged(Label * label){
     return input->onLabelChanged(label);
 }

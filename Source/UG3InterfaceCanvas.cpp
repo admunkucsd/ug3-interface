@@ -59,7 +59,15 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, int numChannels
 
     populateInputs();
     
+    //node->bindInputActionComponentsToEditor(this);
+    
+    for(Component* inputEditorComponent: node->getInputEditorComponents()) {
+        addAndMakeVisible(inputEditorComponent);
+    }
+    
     addAndMakeVisible (viewport.get());
+    
+
     
     update();
     
@@ -122,7 +130,7 @@ void UG3InterfaceCanvas::resized()
     
     viewport->setBounds(0, 0, getWidth(), getHeight()-30); // leave space at bottom for buttons
 
-    gridDisplay->setBounds(0,0,getWidth()-scrollBarThickness, gridDisplay->getTotalHeight());
+    gridDisplay->setBounds(0,0, std::max(gridDisplay->getTotalHeight(), getWidth() - scrollBarThickness), gridDisplay->getTotalHeight());
 
     inputSelector->setBounds(10, getHeight()-25, 120, 20);
     

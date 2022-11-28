@@ -31,10 +31,15 @@ UG3SimulatedInput::UG3SimulatedInputUI::UG3SimulatedInputUI(UG3SimulatedInput* s
     simulationSelector->setSelectedId (1, dontSendNotification);
 }
 
-std::vector<Component*> UG3SimulatedInput::UG3SimulatedInputUI::getComponents(){
+std::vector<Component*> UG3SimulatedInput::UG3SimulatedInputUI::getEditorComponents(){
     std::vector<Component*> returnVector;
     returnVector.push_back(simulationSelector);
     returnVector.push_back(simulationLabel);
+    return returnVector;
+}
+
+std::vector<Component*> UG3SimulatedInput::UG3SimulatedInputUI::getCanvasComponents(){
+    std::vector<Component*> returnVector;
     return returnVector;
 }
 
@@ -43,6 +48,10 @@ void UG3SimulatedInput::UG3SimulatedInputUI::bindComboBoxesToEditor(ComboBox::Li
 }
 void UG3SimulatedInput::UG3SimulatedInputUI::bindLabelsToEditor(Label::Listener* listener) {}
 void UG3SimulatedInput::UG3SimulatedInputUI::bindButtonsToEditor(Button::Listener* listener) {}
+
+void UG3SimulatedInput::UG3SimulatedInputUI::bindComboBoxesToCanvas(ComboBox::Listener* listener){}
+void UG3SimulatedInput::UG3SimulatedInputUI::bindLabelsToCanvas(Label::Listener* listener){}
+void UG3SimulatedInput::UG3SimulatedInputUI::bindButtonsToCanvas(Button::Listener* listener){}
 
 bool UG3SimulatedInput::UG3SimulatedInputUI::onComboBoxChanged(ComboBox * comboBox){
     if(comboBox == simulationSelector) {
@@ -116,7 +125,11 @@ bool UG3SimulatedInput::loadBuffer(void * destBuffer, int maxBytestoRead){
 }
 
 std::vector<Component*> UG3SimulatedInput::getEditorComponents(){
-    return ui->getComponents();
+    return ui->getEditorComponents();
+}
+
+std::vector<Component*> UG3SimulatedInput::getCanvasComponents(){
+    return ui->getCanvasComponents();
 }
 
 void UG3SimulatedInput::bindComboBoxesToEditor(ComboBox::Listener* listener) {
@@ -126,6 +139,16 @@ void UG3SimulatedInput::bindLabelsToEditor(Label::Listener* listener) {
     ui->bindLabelsToEditor(listener);
 }
 void UG3SimulatedInput::bindButtonsToEditor(Button::Listener* listener) {
+    ui->bindButtonsToEditor(listener);
+}
+
+void UG3SimulatedInput::bindComboBoxesToCanvas(ComboBox::Listener* listener) {
+    ui->bindComboBoxesToCanvas(listener);
+}
+void UG3SimulatedInput::bindLabelsToCanvas(Label::Listener* listener) {
+    ui->bindLabelsToEditor(listener);
+}
+void UG3SimulatedInput::bindButtonsToCanvas(Button::Listener* listener) {
     ui->bindButtonsToEditor(listener);
 }
 

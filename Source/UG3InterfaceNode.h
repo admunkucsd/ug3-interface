@@ -17,6 +17,8 @@ namespace UG3Interface
 
     class UG3InterfaceEditor;
 
+    class UG3InterfaceCanvas;
+
     class ActivityDataContainer
     {
     public:
@@ -95,6 +97,8 @@ namespace UG3Interface
         std::vector<Component*> getInputEditorComponents();
         
         void bindInputActionComponentsToEditor(UG3InterfaceEditor* editor);
+        void bindInputActionComponentsToCanvas(UG3InterfaceCanvas* canvas);
+
         
         bool onInputLabelChanged(Label * label);
         bool onInputComboBoxChanged(ComboBox * comboBox);
