@@ -31,7 +31,8 @@ namespace UG3Interface {
 class UG3GridDisplay;
 
 class UG3InterfaceCanvas : public Visualizer,
-    public Label::Listener
+    public Label::Listener,
+    public ComboBox::Listener
 {
 public:
 
@@ -62,6 +63,10 @@ public:
 
     /** Label::Listener callback*/
     void labelTextChanged(Label* label);
+    
+    /** ComboBox::Listener callback*/
+    void comboBoxChanged (ComboBox* combo);
+
 
     /**
      *  Overrides from juce::Component
@@ -72,6 +77,8 @@ public:
 
     /** Custom method for updating settings */
     void updateDataStream(DataStream* stream);
+    
+    void populateInputs();
 
 
 private:
@@ -79,9 +86,13 @@ private:
 
     std::unique_ptr<class UG3InterfaceViewport> viewport;
     std::unique_ptr<UG3GridDisplay> gridDisplay;
+    
+    ScopedPointer<ComboBox> inputSelector;
 
     int numChannels;
     unsigned long long inputMaxValue;
+    
+    int scrollBarThickness;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3InterfaceCanvas);
 };

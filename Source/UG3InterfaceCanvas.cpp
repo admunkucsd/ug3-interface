@@ -48,9 +48,20 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, int numChannels
 
     gridDisplay = std::make_unique<UG3GridDisplay>(this, viewport.get(), numChannels);
     
-    viewport->setViewedComponent(gridDisplay.get());
+    viewport->setViewedComponent(gridDisplay.get(), false);
+    viewport->setScrollBarsShown(true, true, true, true);
+
+    scrollBarThickness = viewport->getScrollBarThickness();
     
-    gridDisplay->updateDisplayDimensions();
+    inputSelector = new ComboBox ("Input Selector");
+    inputSelector->addListener (this);
+    addAndMakeVisible (inputSelector);
+
+    populateInputs();
+    
+    addAndMakeVisible (viewport.get());
+    
+    update();
     
 
 }
@@ -61,16 +72,20 @@ UG3InterfaceCanvas::~UG3InterfaceCanvas()
 
 void UG3InterfaceCanvas::refreshState()
 {
+    resized();
 }
 
 void UG3InterfaceCanvas::update()
 {
-
+    gridDisplay->resized();
 }
 
 void UG3InterfaceCanvas::labelTextChanged(Label* label)
 {
 }
+
+void UG3InterfaceCanvas::comboBoxChanged (ComboBox* combo){}
+
 
 
 void UG3InterfaceCanvas::refresh()
@@ -99,12 +114,33 @@ void UG3InterfaceCanvas::endAnimation()
 void UG3InterfaceCanvas::paint(Graphics &g)
 {
 
-    g.fillAll(Colours::darkgrey);
+    g.fillAll(Colours::black);
 }
 
 void UG3InterfaceCanvas::resized()
 {
+    
+    viewport->setBounds(0, 0, getWidth(), getHeight()-30); // leave space at bottom for buttons
+
+    gridDisplay->setBounds(0,0,getWidth()-scrollBarThickness, gridDisplay->getTotalHeight());
+
+    inputSelector->setBounds(10, getHeight()-25, 120, 20);
+    
+
 }
+
+
+void UG3InterfaceCanvas::populateInputs ()
+{
+    int i = 0;
+    for (String input:node->getInputNames())
+    {
+        inputSelector->addItem(input, i + 1);
+        i++;
+    }
+    inputSelector->setSelectedId (1, dontSendNotification);
+}
+
 
 #pragma mark - UG3InterfaceViewport -
 

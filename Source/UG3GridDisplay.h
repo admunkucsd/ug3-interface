@@ -38,11 +38,19 @@ public:
     
     void refresh(const float * peakToPeakValues, int const maxValue);
     
+    void resized();
+    
+    void paint(Graphics& g);
+    
+    int getTotalHeight() {return totalHeight;}
+    
 private:
     UG3InterfaceCanvas* canvas;
     Viewport* viewport;
     int numChannels;
     OwnedArray<Electrode> electrodes;
+    
+    int totalHeight;
 
     
 };
