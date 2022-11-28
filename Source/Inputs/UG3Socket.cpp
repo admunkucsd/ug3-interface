@@ -129,6 +129,9 @@ void UG3Socket::UG3SocketUI::loadCustomParametersFromXml(XmlElement* parameters)
     sampleRateInput->setText(parameters->getStringAttribute("fs", ""), dontSendNotification);
 }
 
+void UG3Socket::UG3SocketUI::resizeEditorComponents(int startX, int startY){}
+void UG3Socket::UG3SocketUI::resizeCanvasComponents(int startX, int startY){}
+
 UG3Socket::UG3Socket(bool& connected, int port, float sampleRate) : port(port), sampleRate(sampleRate), UG3Input(connected){
     ui = new UG3SocketUI(this);
     
@@ -224,4 +227,7 @@ void UG3Socket::loadCustomParametersFromXml(XmlElement* parameters){
     port = parameters->getIntAttribute("port", port);
     sampleRate = parameters->getDoubleAttribute("fs", sampleRate);
 }
+
+void UG3Socket::resizeEditorComponents(int startX, int startY) {ui->resizeEditorComponents(startX, startY);}
+void UG3Socket::resizeCanvasComponents(int startX, int startY) {ui->resizeCanvasComponents(startX, startY);}
 

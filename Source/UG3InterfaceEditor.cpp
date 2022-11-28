@@ -230,10 +230,6 @@ void UG3InterfaceEditor::comboBoxChanged (ComboBox* combo){
         }
         CoreServices::updateSignalChain (this);
     }
-    else if (node->onInputComboBoxChanged(combo)) {
-        CoreServices::updateSignalChain(this);
-
-    }
 }
 
 void UG3InterfaceEditor::populateInputs ()

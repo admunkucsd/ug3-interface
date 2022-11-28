@@ -59,17 +59,17 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, int numChannels
 
     populateInputs();
     
-    //node->bindInputActionComponentsToEditor(this);
+    node->bindInputActionComponentsToCanvas(this);
     
-    for(Component* inputEditorComponent: node->getInputEditorComponents()) {
-        addAndMakeVisible(inputEditorComponent);
+    for(Component* inputCanvasComponent: node->getInputCanvasComponents()) {
+        addAndMakeVisible(inputCanvasComponent);
     }
     
     addAndMakeVisible (viewport.get());
     
-
-    
     update();
+    
+    
     
 
 }
@@ -92,7 +92,9 @@ void UG3InterfaceCanvas::labelTextChanged(Label* label)
 {
 }
 
-void UG3InterfaceCanvas::comboBoxChanged (ComboBox* combo){}
+void UG3InterfaceCanvas::comboBoxChanged (ComboBox* combo){
+    node->onInputComboBoxChanged(combo);
+}
 
 
 
@@ -127,13 +129,16 @@ void UG3InterfaceCanvas::paint(Graphics &g)
 
 void UG3InterfaceCanvas::resized()
 {
-    
+    int componentsEndX = 0;
     viewport->setBounds(0, 0, getWidth(), getHeight()-30); // leave space at bottom for buttons
 
     gridDisplay->setBounds(0,0, std::max(gridDisplay->getTotalHeight(), getWidth() - scrollBarThickness), gridDisplay->getTotalHeight());
 
     inputSelector->setBounds(10, getHeight()-25, 120, 20);
-    
+    componentsEndX += inputSelector->getX()+inputSelector->getWidth();
+        
+    node->resizeCanvasComponents(componentsEndX, getHeight());
+    std::cout <<"resizing" <<std::endl;
 
 }
 

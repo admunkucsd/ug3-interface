@@ -13,12 +13,6 @@ using namespace UG3Interface;
 
 UG3SimulatedInput::UG3SimulatedInputUI::UG3SimulatedInputUI(UG3SimulatedInput* simulator):simulator(simulator) {
     simulationSelector = new ComboBox ("Simulation Selector");
-    simulationSelector->setBounds (301, 60, 100, 20);
-    
-    simulationLabel = new Label ("Simulation", "Simulation");
-    simulationLabel -> setFont(Font("Small Text", 10, Font::plain));
-    simulationLabel->setBounds (295, 48, 65, 8);
-    simulationLabel->setColour(Label::textColourId, Colours::darkgrey);
 
     int i = 0;
     for (auto input : simulator->simulationOptions)
@@ -33,23 +27,22 @@ UG3SimulatedInput::UG3SimulatedInputUI::UG3SimulatedInputUI(UG3SimulatedInput* s
 
 std::vector<Component*> UG3SimulatedInput::UG3SimulatedInputUI::getEditorComponents(){
     std::vector<Component*> returnVector;
-    returnVector.push_back(simulationSelector);
-    returnVector.push_back(simulationLabel);
     return returnVector;
 }
 
 std::vector<Component*> UG3SimulatedInput::UG3SimulatedInputUI::getCanvasComponents(){
     std::vector<Component*> returnVector;
+    returnVector.push_back(simulationSelector);
     return returnVector;
 }
 
-void UG3SimulatedInput::UG3SimulatedInputUI::bindComboBoxesToEditor(ComboBox::Listener* listener) {
-    simulationSelector -> addListener(listener);
-}
+void UG3SimulatedInput::UG3SimulatedInputUI::bindComboBoxesToEditor(ComboBox::Listener* listener) {}
 void UG3SimulatedInput::UG3SimulatedInputUI::bindLabelsToEditor(Label::Listener* listener) {}
 void UG3SimulatedInput::UG3SimulatedInputUI::bindButtonsToEditor(Button::Listener* listener) {}
 
-void UG3SimulatedInput::UG3SimulatedInputUI::bindComboBoxesToCanvas(ComboBox::Listener* listener){}
+void UG3SimulatedInput::UG3SimulatedInputUI::bindComboBoxesToCanvas(ComboBox::Listener* listener){
+    simulationSelector -> addListener(listener);
+}
 void UG3SimulatedInput::UG3SimulatedInputUI::bindLabelsToCanvas(Label::Listener* listener){}
 void UG3SimulatedInput::UG3SimulatedInputUI::bindButtonsToCanvas(Button::Listener* listener){}
 
@@ -68,6 +61,11 @@ bool UG3SimulatedInput::UG3SimulatedInputUI::onButtonPressed(Button * button){re
 void UG3SimulatedInput::UG3SimulatedInputUI::saveCustomParametersToXml(XmlElement* parameters){}
 void UG3SimulatedInput::UG3SimulatedInputUI::loadCustomParametersFromXml(XmlElement* parameters){}
 
+
+void UG3SimulatedInput::UG3SimulatedInputUI::resizeEditorComponents(int startX, int startY){}
+void UG3SimulatedInput::UG3SimulatedInputUI::resizeCanvasComponents(int startX, int startY){
+    simulationSelector->setBounds (startX + simulator->canvasXSpacing, startY - simulator->canvasYHeight - simulator->canvasYSpacing, 100, simulator->canvasYHeight);
+}
 
 UG3SimulatedInput::UG3SimulatedInput(bool& connected, int channelsX, int channelsY, int samples, unsigned long long maxValue): channelsX(channelsX), channelsY(channelsY),  samples(samples), maxValue(maxValue), counter(0), UG3Input(connected){
     simulatedValues = (uint16_t *) malloc(channelsX * channelsY * sizeof(uint16_t) * samples);
@@ -174,4 +172,10 @@ void UG3SimulatedInput::loadCustomParametersFromXml(XmlElement* parameters){
     ui->loadCustomParametersFromXml(parameters);
 }
 
+void UG3SimulatedInput::resizeEditorComponents(int startX, int startY) {
+    ui->resizeEditorComponents(startX, startY);
+}
+void UG3SimulatedInput::resizeCanvasComponents(int startX, int startY) {
+    ui->resizeCanvasComponents(startX, startY);
+}
 

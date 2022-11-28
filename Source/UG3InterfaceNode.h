@@ -95,11 +95,15 @@ namespace UG3Interface
         
         void changeInput(int index);
         std::vector<Component*> getInputEditorComponents();
+        std::vector<Component*> getInputCanvasComponents();
+
         
         void bindInputActionComponentsToEditor(UG3InterfaceEditor* editor);
         void bindInputActionComponentsToCanvas(UG3InterfaceCanvas* canvas);
 
-        
+        void resizeEditorComponents(int startX, int startY);
+        void resizeCanvasComponents(int startX, int startY);
+
         bool onInputLabelChanged(Label * label);
         bool onInputComboBoxChanged(ComboBox * comboBox);
         bool onInputButtonPressed(Button * button);

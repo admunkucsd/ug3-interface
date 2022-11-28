@@ -43,12 +43,18 @@ public:
     virtual bool onComboBoxChanged(ComboBox * comboBox)=0;
     virtual bool onLabelChanged(Label * label)=0;
     virtual bool onButtonPressed(Button * button)=0;
+    
+    virtual void resizeEditorComponents(int startX, int startY)=0;
+    virtual void resizeCanvasComponents(int startX, int startY)=0;
 
    
     virtual void saveCustomParametersToXml(XmlElement* parameters) = 0;
     virtual void loadCustomParametersFromXml(XmlElement* parameters) = 0;
-    protected:
-        bool& connected;
+protected:
+    bool& connected;
+    const int canvasXSpacing = 10;
+    const int canvasYSpacing = 5;
+    const int canvasYHeight = 20;
 };
 
 }

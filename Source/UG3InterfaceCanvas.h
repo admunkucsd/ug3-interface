@@ -93,7 +93,7 @@ private:
     unsigned long long inputMaxValue;
     
     int scrollBarThickness;
-
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3InterfaceCanvas);
 };
 

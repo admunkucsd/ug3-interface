@@ -46,6 +46,10 @@ public:
     void saveCustomParametersToXml(XmlElement* parameters) override;
     void loadCustomParametersFromXml(XmlElement* parameters) override;
     
+    void resizeEditorComponents(int startX, int startY) override;
+    void resizeCanvasComponents(int startX, int startY) override;
+
+    
     void makeColorWave();
     void makeSine();
     
@@ -73,10 +77,12 @@ private:
         void saveCustomParametersToXml(XmlElement* parameters);
         void loadCustomParametersFromXml(XmlElement* parameters);
         
+        void resizeEditorComponents(int startX, int startY);
+        void resizeCanvasComponents(int startX, int startY);
+        
     private:
         UG3SimulatedInput* simulator;
         ScopedPointer<ComboBox> simulationSelector;
-        ScopedPointer<Label>    simulationLabel;
     };
     
     std::map<String, std::function<void()>> simulationOptions;

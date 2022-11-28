@@ -39,6 +39,9 @@ public:
     
     void saveCustomParametersToXml(XmlElement* parameters) override;
     void loadCustomParametersFromXml(XmlElement* parameters) override;
+    
+    void resizeEditorComponents(int startX, int startY) override;
+    void resizeCanvasComponents(int startX, int startY) override;
 
 private:
     ScopedPointer<DatagramSocket> socket;
@@ -64,6 +67,9 @@ private:
         
         void saveCustomParametersToXml(XmlElement* parameters);
         void loadCustomParametersFromXml(XmlElement* parameters);
+        
+        void resizeEditorComponents(int startX, int startY);
+        void resizeCanvasComponents(int startX, int startY);
         
     private:
         //Editor Components

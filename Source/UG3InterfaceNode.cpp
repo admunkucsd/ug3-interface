@@ -306,6 +306,10 @@ std::vector<Component*> UG3InterfaceNode::getInputEditorComponents() {
     return input->getEditorComponents();
 }
 
+std::vector<Component*> UG3InterfaceNode::getInputCanvasComponents() {
+    return input->getCanvasComponents();
+}
+
 void UG3InterfaceNode::bindInputActionComponentsToEditor(UG3InterfaceEditor* editor) {
     input -> bindLabelsToEditor(dynamic_cast<Label::Listener*>(editor));
     input -> bindComboBoxesToEditor(dynamic_cast<ComboBox::Listener*>(editor));
@@ -336,5 +340,12 @@ void UG3InterfaceNode::saveInputCustomParametersToXml(XmlElement* parameters){
 }
 void UG3InterfaceNode::loadInputCustomParametersFromXml(XmlElement* parameters){
     input->loadCustomParametersFromXml(parameters);
+}
+
+void UG3InterfaceNode::resizeEditorComponents(int startX, int startY) {
+    input->resizeEditorComponents(startX, startY);
+}
+void UG3InterfaceNode::resizeCanvasComponents(int startX, int startY) {
+    input->resizeCanvasComponents(startX, startY);
 }
 
