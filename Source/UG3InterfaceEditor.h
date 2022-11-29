@@ -54,29 +54,7 @@ namespace UG3Interface
 
 
     private:
-        
-        // Buffer size
-        ScopedPointer<Label> bufferSizeMainLabel;
-
-        // x label
-        ScopedPointer<Label> xLabel;
-
-        // Chans
-        ScopedPointer<Label> channelCountLabel;
-        ScopedPointer<Label> channelCountInput;
-
-        // Samples
-        ScopedPointer<Label> bufferSizeLabel;
-        ScopedPointer<Label> bufferSizeInput;
-
-        // Scale
-        ScopedPointer<Label> scaleLabel;
-        ScopedPointer<Label> scaleInput;
-
-        // Offset
-        ScopedPointer<Label> offsetLabel;
-        ScopedPointer<Label> offsetInput;
-        
+    
         ScopedPointer<ComboBox> inputSelector;
         ScopedPointer<Label>    inputLabel;
 

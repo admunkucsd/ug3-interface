@@ -13,34 +13,35 @@ UG3Socket::UG3SocketUI::UG3SocketUI(UG3Socket* socket): socket(socket){
     // Add connect button
     connectButton = new UtilityButton("CONNECT", Font("Small Text", 12, Font::bold));
     connectButton->setRadius(3.0f);
-    connectButton->setBounds(301, 35, 70, 20);
 
     // Port
     portLabel = new Label("Port Label", "Port");
-    portLabel->setFont(Font("Small Text", 10, Font::plain));
-    portLabel->setBounds(296, 60, 65, 8);
-    portLabel->setColour(Label::textColourId, Colours::darkgrey);
+    portLabel->setFont(Font("Small Text", 16, Font::plain));
+    portLabel->setColour(Label::textColourId, Colours::white);
 
     portInput = new Label("Port Input", String(socket->port));
-    portInput->setFont(Font("Small Text", 10, Font::plain));
-    portInput->setColour(Label::backgroundColourId, Colours::lightgrey);
+    portInput->setFont(Font("Small Text", 16, Font::plain));
+    portInput->setColour(Label::backgroundColourId, Colours::white);
     portInput->setEditable(true);
-    portInput->setBounds(301, 70, 65, 15);
     
     // Fs
     sampleRateLabel = new Label("Sample Rate Label", "FREQ (HZ)");
-    sampleRateLabel->setFont(Font("Small Text", 10, Font::plain));
-    sampleRateLabel->setBounds(296, 92, 85, 8);
-    sampleRateLabel->setColour(Label::textColourId, Colours::darkgrey);
+    sampleRateLabel->setFont(Font("Small Text", 16, Font::plain));
+    sampleRateLabel->setColour(Label::textColourId, Colours::white);
 
     sampleRateInput = new Label("Sample Rate Input", String(int(socket->sampleRate)));
-    sampleRateInput->setFont(Font("Small Text", 10, Font::plain));
-    sampleRateInput->setBounds(301, 105, 65, 15);
+    sampleRateInput->setFont(Font("Small Text", 16, Font::plain));
     sampleRateInput->setEditable(true);
-    sampleRateInput->setColour(Label::backgroundColourId, Colours::lightgrey);
+    sampleRateInput->setColour(Label::backgroundColourId, Colours::white);
 }
 
 std::vector<Component*> UG3Socket::UG3SocketUI::getEditorComponents(){
+    std::vector<Component*> returnVector;
+    return returnVector;
+
+}
+
+std::vector<Component*> UG3Socket::UG3SocketUI::getCanvasComponents(){
     std::vector<Component*> returnVector;
     returnVector.push_back(connectButton);
     returnVector.push_back(portLabel);
@@ -51,27 +52,21 @@ std::vector<Component*> UG3Socket::UG3SocketUI::getEditorComponents(){
 
 }
 
-std::vector<Component*> UG3Socket::UG3SocketUI::getCanvasComponents(){
-    std::vector<Component*> returnVector;
-    return returnVector;
-
-}
-
 void UG3Socket::UG3SocketUI::bindComboBoxesToEditor(ComboBox::Listener* listener){}
 
-void UG3Socket::UG3SocketUI::bindLabelsToEditor(Label::Listener* listener){
-    portInput->addListener(listener);
-    sampleRateInput->addListener(listener);
+void UG3Socket::UG3SocketUI::bindLabelsToEditor(Label::Listener* listener){}
 
-}
-
-void UG3Socket::UG3SocketUI::bindButtonsToEditor(Button::Listener* listener){
-    connectButton->addListener(listener);
-}
+void UG3Socket::UG3SocketUI::bindButtonsToEditor(Button::Listener* listener){}
 
 void UG3Socket::UG3SocketUI::bindComboBoxesToCanvas(ComboBox::Listener* listener){}
-void UG3Socket::UG3SocketUI::bindLabelsToCanvas(Label::Listener* listener){}
-void UG3Socket::UG3SocketUI::bindButtonsToCanvas(Button::Listener* listener){}
+
+void UG3Socket::UG3SocketUI::bindLabelsToCanvas(Label::Listener* listener){
+    portInput->addListener(listener);
+    sampleRateInput->addListener(listener);
+}
+void UG3Socket::UG3SocketUI::bindButtonsToCanvas(Button::Listener* listener){
+    connectButton->addListener(listener);
+}
 
 bool UG3Socket::UG3SocketUI::onLabelChanged(Label * label){
     if (label == sampleRateInput)
@@ -130,7 +125,23 @@ void UG3Socket::UG3SocketUI::loadCustomParametersFromXml(XmlElement* parameters)
 }
 
 void UG3Socket::UG3SocketUI::resizeEditorComponents(int startX, int startY){}
-void UG3Socket::UG3SocketUI::resizeCanvasComponents(int startX, int startY){}
+void UG3Socket::UG3SocketUI::resizeCanvasComponents(int startX, int startY){
+    int x = startX;
+    int y = startY - socket->canvasYHeight - socket->canvasYSpacing;
+    connectButton->setBounds(x, y, 70, 20);
+    
+    x = connectButton->getX() + connectButton->getWidth() + socket->canvasXSpacing;
+    portLabel->setBounds(x, y, 65, 15);
+    
+    x = portLabel->getX() + portLabel->getWidth() + socket->canvasXSpacing;
+    portInput->setBounds(x, y, 65, 15);
+    
+    x = portInput->getX() + portInput->getWidth() + socket->canvasXSpacing;
+    sampleRateLabel->setBounds(x, y, 85, 15);
+    
+    x = sampleRateLabel->getX() + sampleRateLabel->getWidth() + socket->canvasXSpacing;
+    sampleRateInput->setBounds(x, y, 65, 15);
+}
 
 UG3Socket::UG3Socket(bool& connected, int port, float sampleRate) : port(port), sampleRate(sampleRate), UG3Input(connected){
     ui = new UG3SocketUI(this);

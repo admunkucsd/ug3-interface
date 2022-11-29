@@ -311,17 +311,17 @@ std::vector<Component*> UG3InterfaceNode::getInputCanvasComponents() {
 }
 
 void UG3InterfaceNode::bindInputActionComponentsToEditor(UG3InterfaceEditor* editor) {
-    input -> bindLabelsToEditor(dynamic_cast<Label::Listener*>(editor));
-    input -> bindComboBoxesToEditor(dynamic_cast<ComboBox::Listener*>(editor));
-    input -> bindButtonsToEditor(dynamic_cast<Button::Listener*>(editor));
+    input -> bindLabelsToEditor((Label::Listener*)(editor));
+    input -> bindComboBoxesToEditor((ComboBox::Listener*)(editor));
+    input -> bindButtonsToEditor((Button::Listener*)(editor));
 
 
 }
 
 void UG3InterfaceNode::bindInputActionComponentsToCanvas(UG3InterfaceCanvas* canvas) {
-    input -> bindLabelsToCanvas(dynamic_cast<Label::Listener*>(canvas));
-    input -> bindComboBoxesToCanvas(dynamic_cast<ComboBox::Listener*>(canvas));
-    input -> bindButtonsToCanvas(dynamic_cast<Button::Listener*>(canvas));
+    input -> bindLabelsToCanvas((Label::Listener*)(canvas));
+    input -> bindComboBoxesToCanvas((ComboBox::Listener*)(canvas));
+    input -> bindButtonsToCanvas((Button::Listener*)(canvas));
 }
 
 

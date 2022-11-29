@@ -53,12 +53,6 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, int numChannels
 
     scrollBarThickness = viewport->getScrollBarThickness();
     
-    inputSelector = new ComboBox ("Input Selector");
-    inputSelector->addListener (this);
-    addAndMakeVisible (inputSelector);
-
-    populateInputs();
-    
     node->bindInputActionComponentsToCanvas(this);
     
     for(Component* inputCanvasComponent: node->getInputCanvasComponents()) {
@@ -66,11 +60,8 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, int numChannels
     }
     
     addAndMakeVisible (viewport.get());
-    
+
     update();
-    
-    
-    
 
 }
 
@@ -129,30 +120,31 @@ void UG3InterfaceCanvas::paint(Graphics &g)
 
 void UG3InterfaceCanvas::resized()
 {
-    int componentsEndX = 0;
+    int componentsEndX = 10;
     viewport->setBounds(0, 0, getWidth(), getHeight()-30); // leave space at bottom for buttons
 
     gridDisplay->setBounds(0,0, std::max(gridDisplay->getTotalHeight(), getWidth() - scrollBarThickness), gridDisplay->getTotalHeight());
-
-    inputSelector->setBounds(10, getHeight()-25, 120, 20);
-    componentsEndX += inputSelector->getX()+inputSelector->getWidth();
         
     node->resizeCanvasComponents(componentsEndX, getHeight());
-    std::cout <<"resizing" <<std::endl;
 
 }
 
 
-void UG3InterfaceCanvas::populateInputs ()
-{
-    int i = 0;
-    for (String input:node->getInputNames())
-    {
-        inputSelector->addItem(input, i + 1);
-        i++;
+void UG3InterfaceCanvas::addInputComponents(){
+    node->bindInputActionComponentsToCanvas(this);
+    for(Component* inputCanvasComponent: node->getInputCanvasComponents()) {
+        addAndMakeVisible(inputCanvasComponent);
     }
-    inputSelector->setSelectedId (1, dontSendNotification);
+    resized();
 }
+
+void UG3InterfaceCanvas::removeInputComponents(){
+    for(Component* inputCanvasComponent: node->getInputCanvasComponents()) {
+        removeChildComponent(inputCanvasComponent);
+    }
+}
+
+
 
 
 #pragma mark - UG3InterfaceViewport -

@@ -64,7 +64,7 @@ void UG3SimulatedInput::UG3SimulatedInputUI::loadCustomParametersFromXml(XmlElem
 
 void UG3SimulatedInput::UG3SimulatedInputUI::resizeEditorComponents(int startX, int startY){}
 void UG3SimulatedInput::UG3SimulatedInputUI::resizeCanvasComponents(int startX, int startY){
-    simulationSelector->setBounds (startX + simulator->canvasXSpacing, startY - simulator->canvasYHeight - simulator->canvasYSpacing, 100, simulator->canvasYHeight);
+    simulationSelector->setBounds (startX, startY - simulator->canvasYHeight - simulator->canvasYSpacing, 100, simulator->canvasYHeight);
 }
 
 UG3SimulatedInput::UG3SimulatedInput(bool& connected, int channelsX, int channelsY, int samples, unsigned long long maxValue): channelsX(channelsX), channelsY(channelsY),  samples(samples), maxValue(maxValue), counter(0), UG3Input(connected){

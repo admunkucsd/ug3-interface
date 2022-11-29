@@ -66,6 +66,9 @@ public:
     
     /** ComboBox::Listener callback*/
     void comboBoxChanged (ComboBox* combo);
+    
+    void addInputComponents();
+    void removeInputComponents();
 
 
     /**
@@ -78,7 +81,6 @@ public:
     /** Custom method for updating settings */
     void updateDataStream(DataStream* stream);
     
-    void populateInputs();
 
 
 private:
@@ -87,8 +89,6 @@ private:
     std::unique_ptr<class UG3InterfaceViewport> viewport;
     std::unique_ptr<UG3GridDisplay> gridDisplay;
     
-    ScopedPointer<ComboBox> inputSelector;
-
     int numChannels;
     unsigned long long inputMaxValue;
     
@@ -106,7 +106,6 @@ public:
 
 private:
     UG3InterfaceCanvas* canvas;
-    class ChannelViewCanvas* channelsView;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3InterfaceViewport);
 };
