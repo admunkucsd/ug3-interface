@@ -97,7 +97,9 @@ UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     bitWidth(DEFAULT_CHANNEL_BITWIDTH),
     lastBufferUpdate(-1),
     sleepFunctionTime(0),
-    sampleRateDifferenceDelay(0)
+    sampleRateDifferenceDelay(0),
+    delay(-1),
+    lastTimerCallback(0)
 {
     //FIXME: Use editor ComboBox to determine input
     //input = new UG3Socket(false, 0,0);
@@ -260,10 +262,12 @@ bool UG3InterfaceNode::updateBuffer()
         num_samp, 
         1);
 
-    total_samples += num_samp;
+    if(total_samples == 0)
+        lastTimerCallback = Time::getHighResolutionTicks();
     
     int64 uSecElapsed = int64 (Time::highResolutionTicksToSeconds(Time::getHighResolutionTicks() - lastBufferUpdate) * 1e6);
-    
+    int64 timeLeftInSecond = int64((Time::highResolutionTicksToSeconds(lastTimerCallback - Time::getHighResolutionTicks()) + 1)*1e6);
+
     //For first bufferUpdate check and store execution time of sleep
     //Else sleep for the difference of expected sample time and timeElapsed
     if(lastBufferUpdate < 0){
@@ -271,21 +275,28 @@ bool UG3InterfaceNode::updateBuffer()
         std::this_thread::sleep_for(std::chrono::microseconds(1));
         sleepFunctionTime = int64 (Time::highResolutionTicksToSeconds(Time::getHighResolutionTicks() - threadSleepTimerStart) * 1e6) - 1;
     }
+    else if( total_samples >= sample_rate) {
+        std::this_thread::sleep_for(std::chrono::microseconds(timeLeftInSecond));
+    }
     else if(uSecElapsed < (1/sample_rate*num_samp*1e6)){
-        std::this_thread::sleep_for(std::chrono::microseconds(uint64(1/sample_rate*num_samp*1e6) - uSecElapsed - sleepFunctionTime - sampleRateDifferenceDelay));
+        int samplesLeft = sample_rate - total_samples;
+        std::this_thread::sleep_for(std::chrono::microseconds(timeLeftInSecond/samplesLeft-uSecElapsed));
     }
     lastBufferUpdate = Time::getHighResolutionTicks();
 
+    total_samples += num_samp;
+
+    
     return true;
 }
 
 void UG3InterfaceNode::timerCallback()
 {
-    //std::cout << "Expected samples: " << int(sample_rate) << ", Actual samples: " << total_samples << std::endl;
+    std::cout << "Expected samples: " << int(sample_rate) << ", Actual samples: " << total_samples << std::endl;
     
     //Calculate the over-correction from the time delay and remove the difference per sample from the sleep time
     float sampleDifference = (1/float(total_samples) - 1/sample_rate);
-    sampleRateDifferenceDelay = total_samples < sample_rate ? sampleDifference*num_samp*1e6 : 0;
+    sampleRateDifferenceDelay = total_samples < sample_rate ? sampleDifference*num_samp*1e6 : sampleRateDifferenceDelay/2;
     
     //relative_sample_rate = (sample_rate * 5) / float(total_samples);
 

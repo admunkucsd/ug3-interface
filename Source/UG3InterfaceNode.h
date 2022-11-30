@@ -3,10 +3,10 @@
 
 #include <DataThreadHeaders.h>
 const int DEFAULT_PORT = 9001;
-const float DEFAULT_SAMPLE_RATE = 30000.0f;
+const float DEFAULT_SAMPLE_RATE = 1000.0f;
 const float DEFAULT_DATA_SCALE = 0.195f;
 const uint16_t DEFAULT_DATA_OFFSET = 32768;
-const int DEFAULT_NUM_SAMPLES = 10;
+const int DEFAULT_NUM_SAMPLES = 1;
 const int DEFAULT_NUM_CHANNELS_X = 64;
 const int DEFAULT_NUM_CHANNELS_Y = 64;
 const uint8_t DEFAULT_CHANNEL_BITWIDTH = 16;
@@ -137,6 +137,9 @@ namespace UG3Interface
         int64 lastBufferUpdate;
         int64 sleepFunctionTime;
         int64 sampleRateDifferenceDelay;
+        int64 lastTimerCallback;
+        
+        int64 delay;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3InterfaceNode);
     };
