@@ -11,6 +11,7 @@
 #include "Inputs/UG3Socket.h"
 #include "Inputs/UG3SimulatedInput.h"
 
+#include <thread>
 
 using namespace UG3Interface;
 
@@ -92,7 +93,11 @@ UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     data_scale(DEFAULT_DATA_SCALE),
     num_channels_x(DEFAULT_NUM_CHANNELS_X),
     num_channels_y(DEFAULT_NUM_CHANNELS_Y),
-    bitWidth(DEFAULT_CHANNEL_BITWIDTH)
+    sample_rate(DEFAULT_SAMPLE_RATE),
+    bitWidth(DEFAULT_CHANNEL_BITWIDTH),
+    lastBufferUpdate(-1),
+    sleepFunctionTime(0),
+    sampleRateDifferenceDelay(0)
 {
     //FIXME: Use editor ComboBox to determine input
     //input = new UG3Socket(false, 0,0);
@@ -101,6 +106,7 @@ UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     sourceBuffers.add(new DataBuffer(num_channels, 10000)); // start with 2 channels and automatically resize
     recvbuf = (uint16_t *) malloc(num_channels * num_samp * 2);
     convbuf = (float *) malloc(num_channels * num_samp * 4);
+
     
     activityDataContainer = std::make_unique<ActivityDataContainer>(num_channels, num_samp);
     //activityDataContainer.reset();
@@ -152,13 +158,12 @@ void UG3InterfaceNode::updateSettings(OwnedArray<ContinuousChannel>* continuousC
     spikeChannels->clear();
     configurationObjects->clear();
     sourceStreams->clear();
-
     DataStream::Settings settings
     {
-        "EphysSocketStream",
+        "UG3InterfaceStream",
         "description",
         "identifier",
-        DEFAULT_SAMPLE_RATE
+        sample_rate
     };
 
     sourceStreams->add(new DataStream(settings));
@@ -207,7 +212,7 @@ bool UG3InterfaceNode::startAcquisition()
 
     eventState = 0;
 
-    //startTimer(5000);
+    startTimer(1000);
 
     startThread();
 
@@ -246,15 +251,6 @@ bool UG3InterfaceNode::updateBuffer()
         sampleNumbers.set(i, total_samples + i);
         ttlEventWords.set(i, eventState);
 
-        if ((total_samples + i) % 15000 == 0)
-        {
-            if (eventState == 0)
-                eventState = 1;
-            else
-                eventState = 0;
-
-            std::cout << eventState << std::endl;
-        }
     }
 
     sourceBuffers[0]->addToBuffer(convbuf,
@@ -265,17 +261,35 @@ bool UG3InterfaceNode::updateBuffer()
         1);
 
     total_samples += num_samp;
+    
+    int64 uSecElapsed = int64 (Time::highResolutionTicksToSeconds(Time::getHighResolutionTicks() - lastBufferUpdate) * 1e6);
+    
+    //For first bufferUpdate check and store execution time of sleep
+    //Else sleep for the difference of expected sample time and timeElapsed
+    if(lastBufferUpdate < 0){
+        int64 threadSleepTimerStart = Time::getHighResolutionTicks();
+        std::this_thread::sleep_for(std::chrono::microseconds(1));
+        sleepFunctionTime = int64 (Time::highResolutionTicksToSeconds(Time::getHighResolutionTicks() - threadSleepTimerStart) * 1e6) - 1;
+    }
+    else if(uSecElapsed < (1/sample_rate*num_samp*1e6)){
+        std::this_thread::sleep_for(std::chrono::microseconds(uint64(1/sample_rate*num_samp*1e6) - uSecElapsed - sleepFunctionTime - sampleRateDifferenceDelay));
+    }
+    lastBufferUpdate = Time::getHighResolutionTicks();
 
     return true;
 }
 
 void UG3InterfaceNode::timerCallback()
 {
-    //std::cout << "Expected samples: " << int(sample_rate * 5) << ", Actual samples: " << total_samples << std::endl;
+    //std::cout << "Expected samples: " << int(sample_rate) << ", Actual samples: " << total_samples << std::endl;
+    
+    //Calculate the over-correction from the time delay and remove the difference per sample from the sleep time
+    float sampleDifference = (1/float(total_samples) - 1/sample_rate);
+    sampleRateDifferenceDelay = total_samples < sample_rate ? sampleDifference*num_samp*1e6 : 0;
     
     //relative_sample_rate = (sample_rate * 5) / float(total_samples);
 
-    //total_samples = 0;
+    total_samples = 0;
 }
 
 unsigned long long UG3InterfaceNode::getInputMaxValue() {

@@ -91,7 +91,7 @@ private:
     
     String simulationSelection;
     float const simPi = 3.1415;
-    int const sinePhaseShiftConstant = 1024;
+    int const sinePhaseShiftConstant = 1000;
     uint16_t *simulatedValues;
     int channelsX;
     int channelsY;
