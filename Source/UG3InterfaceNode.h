@@ -134,13 +134,9 @@ namespace UG3Interface
         Array<double> timestamps;
         Array<uint64> ttlEventWords;
 
-        int64 lastBufferUpdate;
-        int64 sleepFunctionTime;
-        int64 sampleRateDifferenceDelay;
         int64 lastTimerCallback;
+        int64 lastBufferUpdate;
         
-        int64 delay;
-
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3InterfaceNode);
     };
 }
