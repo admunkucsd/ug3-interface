@@ -264,6 +264,7 @@ bool UG3InterfaceNode::updateBuffer()
     
     int64 uSecElapsed = int64 (Time::highResolutionTicksToSeconds(Time::getHighResolutionTicks() - lastBufferUpdate) * 1e6);
     int64 timeLeftInSecond = int64((Time::highResolutionTicksToSeconds(lastTimerCallback - Time::getHighResolutionTicks()) + 1)*1e6);
+    lastBufferUpdate = Time::getHighResolutionTicks();
 
 
     if(lastBufferUpdate > 0){
@@ -278,7 +279,6 @@ bool UG3InterfaceNode::updateBuffer()
 
     
     
-    lastBufferUpdate = Time::getHighResolutionTicks();
 
     total_samples += num_samp;
 
