@@ -214,6 +214,8 @@ bool UG3InterfaceNode::startAcquisition()
     startTimer(1000);
 
     startThread();
+    
+    lastTimerCallback = Time::getHighResolutionTicks();
 
     return true;
 }
@@ -258,9 +260,7 @@ bool UG3InterfaceNode::updateBuffer()
         ttlEventWords.getRawDataPointer(),
         num_samp, 
         1);
-
-    if(total_samples == 0)
-        lastTimerCallback = Time::getHighResolutionTicks();
+    
     
     int64 uSecElapsed = int64 (Time::highResolutionTicksToSeconds(Time::getHighResolutionTicks() - lastBufferUpdate) * 1e6);
     int64 timeLeftInSecond = int64((Time::highResolutionTicksToSeconds(lastTimerCallback - Time::getHighResolutionTicks()) + 1)*1e6);
@@ -275,10 +275,17 @@ bool UG3InterfaceNode::updateBuffer()
             std::this_thread::sleep_for(std::chrono::microseconds(timeLeftInSecond/samplesLeft-uSecElapsed));
         }
     }
+
+    
+    
     lastBufferUpdate = Time::getHighResolutionTicks();
 
     total_samples += num_samp;
 
+    if(timeLeftInSecond < 0){
+        total_samples = 0;
+        lastTimerCallback = Time::getHighResolutionTicks();
+    }
     
     return true;
 }
@@ -290,7 +297,7 @@ void UG3InterfaceNode::timerCallback()
     
     //relative_sample_rate = (sample_rate * 5) / float(total_samples);
 
-    total_samples = 0;
+    //total_samples = 0;
 }
 
 unsigned long long UG3InterfaceNode::getInputMaxValue() {
