@@ -44,6 +44,8 @@ public:
     
     int getTotalHeight() {return totalHeight;}
     
+    void calculateElectrodesSelected();
+
     void mouseDown(const MouseEvent & event);
     void mouseDrag(const MouseEvent & event);
     void mouseUp(const MouseEvent & event);
@@ -61,7 +63,7 @@ private:
     
     const int LEFT_BOUND = 20;
     const int TOP_BOUND = 20;
-    const int SPACING = 2;
+    const int SPACING = 10;
     const int HEIGHT = 8;
     const int WIDTH = 8;
 

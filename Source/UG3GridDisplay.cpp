@@ -7,6 +7,7 @@
 
 #include "UG3GridDisplay.h"
 #include "UG3InterfaceCanvas.h"
+#include <queue>
 
 using namespace UG3Interface;
 
@@ -118,6 +119,30 @@ void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue)
     
 }
 
+void UG3GridDisplay::calculateElectrodesSelected(){
+    int nearestLeftEdge = selection -> getX() - LEFT_BOUND >= 0 ? (selection -> getX() - LEFT_BOUND)/(WIDTH+SPACING) : 0;
+    int columnsSelected = selection -> getTopRight().getX() > LEFT_BOUND ? (selection -> getTopRight().getX() - (LEFT_BOUND + nearestLeftEdge*(WIDTH+SPACING)))/(WIDTH+SPACING) + 1 : 0;
+    int nearestTopEdge = selection -> getY() - TOP_BOUND >= 0 ? (selection -> getY() - TOP_BOUND)/(HEIGHT+SPACING) : 0;
+    int rowsSelected =  selection -> getBottomLeft().getY() > TOP_BOUND ? (selection -> getBottomLeft().getY() - (TOP_BOUND + nearestTopEdge*(HEIGHT+SPACING)))/(HEIGHT+SPACING) + 1 : 0;
+    std::priority_queue<int> electrodeIndexes;
+    
+    
+    for(int i = 0; i < rowsSelected; i++) {
+        for(int j = 0; j < columnsSelected; j++) {
+            electrodeIndexes.push(nearestLeftEdge + j + (nearestTopEdge + i*sqrt(numChannels)));
+        }
+    }
+    
+    std::cout << "NLE: " << nearestLeftEdge << " NTE: " << nearestTopEdge << " cS: " << columnsSelected << " rS " << rowsSelected <<std::endl;
+    std::cout << "Priority queue is: ";
+    while(electrodeIndexes.empty() == false) {
+        std::cout << electrodeIndexes.top() << " ";
+        electrodeIndexes.pop();
+    }
+    std::cout << std::endl;
+    
+}
+
 
 void UG3GridDisplay::mouseDown(const MouseEvent & event) {
     std::cout << "mouse down" << std::endl;
@@ -137,6 +162,7 @@ void UG3GridDisplay::mouseDrag(const MouseEvent & event) {
 void UG3GridDisplay::mouseUp(const MouseEvent & event) {
     std::cout << "mouse up" << std::endl;
 
+    calculateElectrodesSelected();
     selection = nullptr;
     repaint();
 }
