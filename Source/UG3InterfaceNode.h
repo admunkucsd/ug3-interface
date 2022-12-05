@@ -7,8 +7,8 @@ const float DEFAULT_SAMPLE_RATE = 1000.0f;
 const float DEFAULT_DATA_SCALE = 0.195f;
 const uint16_t DEFAULT_DATA_OFFSET = 32768;
 const int DEFAULT_NUM_SAMPLES = 1;
-const int DEFAULT_NUM_CHANNELS_X = 64;
-const int DEFAULT_NUM_CHANNELS_Y = 64;
+const int DEFAULT_NUM_CHANNELS_X = 16;
+const int DEFAULT_NUM_CHANNELS_Y = 16;
 const uint8_t DEFAULT_CHANNEL_BITWIDTH = 16;
 
 namespace UG3Interface

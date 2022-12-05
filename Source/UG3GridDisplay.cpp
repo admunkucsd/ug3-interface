@@ -72,12 +72,7 @@ void UG3GridDisplay::resized() {
     const int totalPixels = numChannels;
     LOGC("Total pixels: ", totalPixels);
 
-    const int LEFT_BOUND = 20;
-    const int TOP_BOUND = 20;
-    const int SPACING = 2;
     const int NUM_COLUMNS = sqrt(numChannels);
-    const int HEIGHT = 8;
-    const int WIDTH = 8;
     
     newTotalHeight = TOP_BOUND;
     
@@ -107,6 +102,8 @@ void UG3GridDisplay::resized() {
 
 void UG3GridDisplay::paint(Graphics& g){
     g.fillAll(Colours::darkgrey);
+    if(selection)
+        g.drawRect(*selection);
 }
 
 void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue) {
@@ -119,6 +116,29 @@ void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue)
 
     
     
+}
+
+
+void UG3GridDisplay::mouseDown(const MouseEvent & event) {
+    std::cout << "mouse down" << std::endl;
+    selectionStartX = event.x;
+    selectionStartY = event.y;
+    selection = new Rectangle<int>(selectionStartX,selectionStartY,0,0);
+}
+
+void UG3GridDisplay::mouseDrag(const MouseEvent & event) {
+    selection -> setWidth(event.x - selectionStartX);
+    selection -> setHeight(event.y - selectionStartY);
+    
+    std::cout << "coords: " << selection->getX() << " " << selection->getY() << " " << selection -> getWidth() << " " << selection -> getHeight() << std::endl;
+    repaint();
+}
+
+void UG3GridDisplay::mouseUp(const MouseEvent & event) {
+    std::cout << "mouse up" << std::endl;
+
+    selection = nullptr;
+    repaint();
 }
 
 

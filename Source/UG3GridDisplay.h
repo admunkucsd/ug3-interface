@@ -44,13 +44,26 @@ public:
     
     int getTotalHeight() {return totalHeight;}
     
+    void mouseDown(const MouseEvent & event);
+    void mouseDrag(const MouseEvent & event);
+    void mouseUp(const MouseEvent & event);
+
+    
 private:
     UG3InterfaceCanvas* canvas;
     Viewport* viewport;
     int numChannels;
     OwnedArray<Electrode> electrodes;
-    
+    ScopedPointer<Rectangle<int>> selection;
+    int selectionStartX;
+    int selectionStartY;
     int totalHeight;
+    
+    const int LEFT_BOUND = 20;
+    const int TOP_BOUND = 20;
+    const int SPACING = 2;
+    const int HEIGHT = 8;
+    const int WIDTH = 8;
 
     
 };

@@ -270,6 +270,7 @@ bool UG3InterfaceNode::updateBuffer()
     if(lastBufferUpdate > 0){
         if( total_samples >= sample_rate) {
             std::this_thread::sleep_for(std::chrono::microseconds(timeLeftInSecond));
+            timeLeftInSecond = int64((Time::highResolutionTicksToSeconds(lastTimerCallback - Time::getHighResolutionTicks()) + 1)*1e6);
         }
         else if(uSecElapsed < (1/sample_rate*num_samp*1e6)){
             int samplesLeft = sample_rate - total_samples;
@@ -278,11 +279,10 @@ bool UG3InterfaceNode::updateBuffer()
     }
 
     
-    
 
     total_samples += num_samp;
 
-    if(timeLeftInSecond < 0){
+    if(timeLeftInSecond < 1/sample_rate){
         total_samples = 0;
         lastTimerCallback = Time::getHighResolutionTicks();
     }
