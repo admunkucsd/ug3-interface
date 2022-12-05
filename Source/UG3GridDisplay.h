@@ -10,6 +10,8 @@
 
 #include <stdio.h>
 #include <VisualizerWindowHeaders.h>
+#include <stack>
+#include <map>
 
 #include "ColourScheme.h"
 
@@ -35,9 +37,7 @@ private:
 class UG3GridDisplay : public Component{
 public:
     UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannels);
-    
-    void updateDisplayDimensions();
-    
+        
     void refresh(const float * peakToPeakValues, int const maxValue);
     
     void resized();
@@ -47,9 +47,11 @@ public:
     
     int getTotalHeight() {return totalHeight;}
     
+    void updateSelectedElectrodes (std::stack<int>& newValues);
     
     class DisplayMouseListener : public Component {
     public:
+        DisplayMouseListener(UG3GridDisplay* display, int numRows);
         void mouseDown(const MouseEvent & event);
         void mouseDrag(const MouseEvent & event);
         void mouseUp(const MouseEvent & event);
@@ -59,9 +61,11 @@ public:
 
         
     private:
+        UG3GridDisplay* display;
         ScopedPointer<Rectangle<int>> selection;
         int selectionStartX;
         int selectionStartY;
+        int numRows;
 
     };
 
@@ -80,7 +84,7 @@ private:
     Viewport* viewport;
     OwnedArray<Electrode> electrodes;
     ScopedPointer<DisplayMouseListener> mouseListener;
-
+    
     int totalHeight;
     
 

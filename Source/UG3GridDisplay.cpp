@@ -24,47 +24,6 @@ void Electrode::paint(Graphics& g)
 UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannels) : canvas(canvas), viewport(viewport), numChannels(numChannels), totalHeight(0){
 }
 
-void UG3GridDisplay::updateDisplayDimensions()
-{
-    int newTotalHeight = 0;
-    electrodes.clear();
-
-    const int totalPixels = numChannels;
-    LOGC("Total pixels: ", totalPixels);
-
-    const int LEFT_BOUND = 20;
-    const int TOP_BOUND = 20;
-    const int SPACING = 2;
-    const int NUM_COLUMNS = sqrt(numChannels);
-    const int HEIGHT = 8;
-    const int WIDTH = 8;
-    
-    newTotalHeight = TOP_BOUND;
-    
-    for (int i = 0; i < totalPixels; i++)
-    {
-        Electrode* e = new Electrode();
-
-        int column = i % NUM_COLUMNS;
-        int row = i / NUM_COLUMNS;
-        int L = LEFT_BOUND + column * (WIDTH + SPACING);
-        int T = TOP_BOUND + row * (HEIGHT + SPACING);
-
-        if(column == 0)
-            newTotalHeight += HEIGHT + SPACING;
-        
-        e->setBounds(L,
-            T,
-            WIDTH,
-            HEIGHT);
-
-        canvas->addAndMakeVisible(e);
-        electrodes.add(e);
-    }
-    
-    totalHeight = newTotalHeight + TOP_BOUND - SPACING;
-
-}
 
 void UG3GridDisplay::resized() {
     int newTotalHeight = 0;
@@ -97,7 +56,7 @@ void UG3GridDisplay::resized() {
         addAndMakeVisible(e);
         electrodes.add(e);
     }
-    mouseListener = new DisplayMouseListener();
+    mouseListener = new DisplayMouseListener(this, sqrt(numChannels));
     mouseListener -> setBounds(0,0, getWidth(), getHeight());
     addAndMakeVisible(mouseListener);
     mouseListener -> toFront(true);
@@ -122,6 +81,17 @@ void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue)
     
 }
 
+void UG3GridDisplay::updateSelectedElectrodes (std::stack<int>& newValues) {
+    while(newValues.empty() == false) {
+        int index = newValues.top();
+        electrodes[index]->setColour(ColourScheme::getColourForNormalizedValue(0.500));
+        newValues.pop();
+    }
+}
+
+
+UG3GridDisplay::DisplayMouseListener::DisplayMouseListener(UG3GridDisplay* display, int numRows) : display(display), numRows(numRows){}
+
 void UG3GridDisplay::DisplayMouseListener::paint(Graphics& g){
     g.fillAll(Colours::transparentWhite);
     if(selection)
@@ -129,32 +99,34 @@ void UG3GridDisplay::DisplayMouseListener::paint(Graphics& g){
 }
 
 void UG3GridDisplay::DisplayMouseListener::calculateElectrodesSelected(){
+    
+    int maxX = LEFT_BOUND + (WIDTH + SPACING) * numRows - SPACING;
+    int maxY = TOP_BOUND + (HEIGHT + SPACING) * numRows - SPACING;
+
+    //Calculate the nearest left edge of an electrode (to the left of the selection left boundary)
     int nearestLeftEdge = selection -> getX() - LEFT_BOUND >= 0 ? (selection -> getX() - LEFT_BOUND)/(WIDTH+SPACING) : 0;
-    int columnsSelected = selection -> getTopRight().getX() > LEFT_BOUND ? (selection -> getTopRight().getX() - (LEFT_BOUND + nearestLeftEdge*(WIDTH+SPACING)))/(WIDTH+SPACING) + 1 : 0;
+    //Calculate the number of columns selected by calculating the number of left edges present in selection from nLE to top right of selection
+    int columnsSelected = selection -> getTopRight().getX() > LEFT_BOUND && selection -> getX() < maxX ? (selection -> getTopRight().getX() - (LEFT_BOUND + nearestLeftEdge*(WIDTH+SPACING)))/(WIDTH+SPACING) + 1 : 0;
+    
+    //Calculate the nearest top edge of an electrode (to the top of selection top boundary)
     int nearestTopEdge = selection -> getY() - TOP_BOUND >= 0 ? (selection -> getY() - TOP_BOUND)/(HEIGHT+SPACING) : 0;
-    int rowsSelected =  selection -> getBottomLeft().getY() > TOP_BOUND ? (selection -> getBottomLeft().getY() - (TOP_BOUND + nearestTopEdge*(HEIGHT+SPACING)))/(HEIGHT+SPACING) + 1 : 0;
-    std::priority_queue<int> electrodeIndexes;
+    //Calculate the number of rows by calculating the number of top edges from nTE to bottom left of selection
+    int rowsSelected =  selection -> getBottomLeft().getY() > TOP_BOUND && selection -> getY() < maxY ? (selection -> getBottomLeft().getY() - (TOP_BOUND + nearestTopEdge*(HEIGHT+SPACING)))/(HEIGHT+SPACING) + 1 : 0;
+    std::stack<int> electrodeIndexes;
     
     
     for(int i = 0; i < rowsSelected; i++) {
         for(int j = 0; j < columnsSelected; j++) {
-            electrodeIndexes.push(nearestLeftEdge + j + (nearestTopEdge + i*16));
+            electrodeIndexes.push(nearestLeftEdge + j + ((nearestTopEdge + i)*numRows));
         }
     }
     
-    std::cout << "NLE: " << nearestLeftEdge << " NTE: " << nearestTopEdge << " cS: " << columnsSelected << " rS " << rowsSelected <<std::endl;
-    std::cout << "Priority queue is: ";
-    while(electrodeIndexes.empty() == false) {
-        std::cout << electrodeIndexes.top() << " ";
-        electrodeIndexes.pop();
-    }
-    std::cout << std::endl;
+    display -> updateSelectedElectrodes(electrodeIndexes);
     
 }
 
 
 void UG3GridDisplay::DisplayMouseListener::mouseDown(const MouseEvent & event) {
-    std::cout << "mouse down" << std::endl;
     selectionStartX = event.x;
     selectionStartY = event.y;
     selection = new Rectangle<int>(selectionStartX,selectionStartY,0,0);
@@ -177,13 +149,10 @@ void UG3GridDisplay::DisplayMouseListener::mouseDrag(const MouseEvent & event) {
 
     }
     
-    std::cout << "coords: " << selection->getX() << " " << selection->getY() << " " << selection -> getWidth() << " " << selection -> getHeight() << std::endl;
     repaint();
 }
 
 void UG3GridDisplay::DisplayMouseListener::mouseUp(const MouseEvent & event) {
-    std::cout << "mouse up" << std::endl;
-
     calculateElectrodesSelected();
     selection = nullptr;
     repaint();

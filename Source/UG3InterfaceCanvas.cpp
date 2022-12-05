@@ -123,7 +123,7 @@ void UG3InterfaceCanvas::resized()
     int componentsEndX = 10;
     viewport->setBounds(0, 0, getWidth(), getHeight()-30); // leave space at bottom for buttons
 
-    gridDisplay->setBounds(0,0, std::max(gridDisplay->getTotalHeight(), getWidth() - scrollBarThickness), gridDisplay->getTotalHeight());
+    gridDisplay->setBounds(0,0, std::max(gridDisplay->getTotalHeight(), getWidth() - scrollBarThickness), std::max(gridDisplay->getTotalHeight(), getHeight() - 30));
         
     node->resizeCanvasComponents(componentsEndX, getHeight());
 
