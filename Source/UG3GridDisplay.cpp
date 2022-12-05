@@ -161,8 +161,21 @@ void UG3GridDisplay::DisplayMouseListener::mouseDown(const MouseEvent & event) {
 }
 
 void UG3GridDisplay::DisplayMouseListener::mouseDrag(const MouseEvent & event) {
-    selection -> setWidth(event.x - selectionStartX);
-    selection -> setHeight(event.y - selectionStartY);
+    if(event.x < selectionStartX) {
+        selection -> setX(event.x);
+        selection -> setWidth(selectionStartX - event.x);
+    }
+    else {
+        selection -> setWidth(event.x - selectionStartX);
+    }
+    if(event.y < selectionStartY) {
+        selection -> setY(event.y);
+        selection -> setHeight(selectionStartY - event.y);
+    }
+    else {
+        selection -> setHeight(event.y - selectionStartY);
+
+    }
     
     std::cout << "coords: " << selection->getX() << " " << selection->getY() << " " << selection -> getWidth() << " " << selection -> getHeight() << std::endl;
     repaint();
