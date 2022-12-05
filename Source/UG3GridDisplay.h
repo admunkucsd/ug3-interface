@@ -30,6 +30,8 @@ private:
     Colour c;
 };
 
+
+
 class UG3GridDisplay : public Component{
 public:
     UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannels);
@@ -42,30 +44,45 @@ public:
     
     void paint(Graphics& g);
     
+    
     int getTotalHeight() {return totalHeight;}
     
-    void calculateElectrodesSelected();
+    
+    class DisplayMouseListener : public Component {
+    public:
+        void mouseDown(const MouseEvent & event);
+        void mouseDrag(const MouseEvent & event);
+        void mouseUp(const MouseEvent & event);
+        void calculateElectrodesSelected();
+        
+        void paint(Graphics& g);
 
-    void mouseDown(const MouseEvent & event);
-    void mouseDrag(const MouseEvent & event);
-    void mouseUp(const MouseEvent & event);
+        
+    private:
+        ScopedPointer<Rectangle<int>> selection;
+        int selectionStartX;
+        int selectionStartY;
+
+    };
+
+    
+protected:
+    const static int LEFT_BOUND = 20;
+    const static int TOP_BOUND = 20;
+    const static int SPACING = 4;
+    const static int HEIGHT = 8;
+    const static int WIDTH = 8;
+    int numChannels;
 
     
 private:
     UG3InterfaceCanvas* canvas;
     Viewport* viewport;
-    int numChannels;
     OwnedArray<Electrode> electrodes;
-    ScopedPointer<Rectangle<int>> selection;
-    int selectionStartX;
-    int selectionStartY;
+    ScopedPointer<DisplayMouseListener> mouseListener;
+
     int totalHeight;
     
-    const int LEFT_BOUND = 20;
-    const int TOP_BOUND = 20;
-    const int SPACING = 10;
-    const int HEIGHT = 8;
-    const int WIDTH = 8;
 
     
 };
