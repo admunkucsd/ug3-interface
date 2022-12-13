@@ -42,6 +42,8 @@ public:
     
     void resizeEditorComponents(int startX, int startY) override;
     void resizeCanvasComponents(int startX, int startY) override;
+    
+    void setIndexes(std::set<int> indexes);
 
 private:
     ScopedPointer<DatagramSocket> socket;

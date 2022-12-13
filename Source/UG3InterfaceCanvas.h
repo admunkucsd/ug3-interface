@@ -25,6 +25,7 @@
 #define __UG3InterfaceCANVAS_H__
 
 #include "VisualizerWindowHeaders.h"
+#include <set>
 
 namespace UG3Interface {
 
@@ -69,6 +70,7 @@ public:
     
     void addInputComponents();
     void removeInputComponents();
+    void setNodeNumChannels(std::set<int> indexes);
 
 
     /**

@@ -27,6 +27,8 @@ Colour Electrode::getColour() {
 }
 
 UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannels) : canvas(canvas), viewport(viewport), numChannels(numChannels), totalHeight(0){
+    selectedColor = ColourScheme::getColourForNormalizedValue(.9);
+    highlightedColor = selectedColor.withAlpha(float(0.7));
 }
 
 
@@ -89,16 +91,17 @@ void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue)
 void UG3GridDisplay::updateSelectedElectrodes (std::set<int>& newValues, bool isFilled) {
     if(isFilled) {
         for(int index : newValues) {
-            electrodes[index] -> setColour(ColourScheme::getColourForNormalizedValue(.9));
+            electrodes[index] -> setColour(selectedColor);
         }
         selectedElectrodeIndexes.insert(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end());
         highlightedElectrodeIndexes.clear();
+        canvas->setNodeNumChannels(selectedElectrodeIndexes);
     }
     else {
         std::set<int> diff;
         std::set_difference(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), newValues.begin(), newValues.end(), std::inserter(diff, diff.end()));
         for(int index : diff) {
-            if(electrodes[index] -> getColour() == ColourScheme::getColourForNormalizedValue(.9).withAlpha(float(0.7)))
+            if(electrodes[index] -> getColour() == highlightedColor)
                 electrodes[index] -> setColour(Colours::grey);
         }
         diff.clear();
@@ -107,7 +110,7 @@ void UG3GridDisplay::updateSelectedElectrodes (std::set<int>& newValues, bool is
         
         for(int index : diff) {
             if(electrodes[index] -> getColour() == Colours::grey)
-                electrodes[index] -> setColour(ColourScheme::getColourForNormalizedValue(.9).withAlpha(float(0.7)));
+                electrodes[index] -> setColour(highlightedColor);
         }
         highlightedElectrodeIndexes = newValues;
     }

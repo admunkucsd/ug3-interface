@@ -127,6 +127,11 @@ UG3InterfaceNode::~UG3InterfaceNode()
     free(convbuf);
 }
 
+void UG3InterfaceNode::setInputIndexes(std::set<int> indexes) {
+    input -> setIndexes(indexes);
+}
+
+
 void UG3InterfaceNode::resizeChanSamp()
 {
     sourceBuffers[0]->resize(num_channels, 10000);

@@ -2,6 +2,7 @@
 #define __EPHYSSOCKETH__
 
 #include <DataThreadHeaders.h>
+#include <set>
 const int DEFAULT_PORT = 9001;
 const float DEFAULT_SAMPLE_RATE = 30000.0f;
 const float DEFAULT_DATA_SCALE = 0.195f;
@@ -81,6 +82,8 @@ namespace UG3Interface
         uint64 eventState;
 
         void resizeChanSamp();
+        
+        void setInputIndexes(std::set<int> indexes);
         
         /**Used to calculate the maximum value for a given input bit width**/
         unsigned long long getInputMaxValue();

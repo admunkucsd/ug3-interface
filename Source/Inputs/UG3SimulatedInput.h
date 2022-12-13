@@ -13,6 +13,7 @@
 #include <vector>
 #include <functional>
 #include <map>
+#include <set>
 #include "../UG3InterfaceComponents.h"
 
 namespace UG3Interface {
@@ -52,6 +53,8 @@ public:
     
     void makeColorWave();
     void makeSine();
+    
+    void setIndexes(std::set<int> indexes);
     
 private:
     
@@ -99,6 +102,8 @@ private:
     int samples;
     unsigned long long maxValue;
     int waveIndex = 0;
+    
+    std::set<int> indexes;
 };
 }
 #endif /* UG3SimulatedInput_h */

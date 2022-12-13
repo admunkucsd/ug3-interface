@@ -242,3 +242,6 @@ void UG3Socket::loadCustomParametersFromXml(XmlElement* parameters){
 void UG3Socket::resizeEditorComponents(int startX, int startY) {ui->resizeEditorComponents(startX, startY);}
 void UG3Socket::resizeCanvasComponents(int startX, int startY) {ui->resizeCanvasComponents(startX, startY);}
 
+void UG3Socket::setIndexes(std::set<int> indexes){}
+
+

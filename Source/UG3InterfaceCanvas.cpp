@@ -144,6 +144,12 @@ void UG3InterfaceCanvas::removeInputComponents(){
     }
 }
 
+void UG3InterfaceCanvas::setNodeNumChannels(std::set<int> indexes) {
+    node->num_channels = indexes.size();
+    node->resizeChanSamp();
+    node->setInputIndexes(indexes);
+}
+
 
 
 

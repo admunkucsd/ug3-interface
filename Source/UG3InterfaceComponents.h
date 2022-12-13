@@ -9,6 +9,7 @@
 #define UG3InterfaceComponents_h
 
 #include <DataThreadHeaders.h>
+#include <set>
 
 namespace UG3Interface {
 
@@ -50,6 +51,9 @@ public:
    
     virtual void saveCustomParametersToXml(XmlElement* parameters) = 0;
     virtual void loadCustomParametersFromXml(XmlElement* parameters) = 0;
+    
+    virtual void setIndexes(std::set<int> indexes) = 0;
+
 protected:
     bool& connected;
     const int canvasXSpacing = 10;

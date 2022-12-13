@@ -52,6 +52,8 @@ public:
     
     void updateSelectedElectrodes (std::set<int>& newValues, bool isFilled = false);
     
+    std::set<int> getSelectedElectrodeIndexes(){return selectedElectrodeIndexes;}
+    
     class DisplayMouseListener : public Component {
     public:
         DisplayMouseListener(UG3GridDisplay* display, int numRows);
@@ -89,6 +91,9 @@ private:
     ScopedPointer<DisplayMouseListener> mouseListener;
     std::set<int> highlightedElectrodeIndexes;
     std::set<int> selectedElectrodeIndexes;
+    
+    Colour selectedColor;
+    Colour highlightedColor;
     
     int totalHeight;
     
