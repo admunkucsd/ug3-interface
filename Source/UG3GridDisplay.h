@@ -88,6 +88,7 @@ private:
     OwnedArray<Electrode> electrodes;
     ScopedPointer<DisplayMouseListener> mouseListener;
     std::set<int> highlightedElectrodeIndexes;
+    std::set<int> selectedElectrodeIndexes;
     
     int totalHeight;
     

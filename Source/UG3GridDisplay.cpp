@@ -77,12 +77,12 @@ void UG3GridDisplay::paint(Graphics& g){
 void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue) {
     int maxChan = jmin(electrodes.size(), numChannels);
     
-    for (int i = 0; i < maxChan; i++)
+    int count = 0;
+    for (int electrodeIndex : selectedElectrodeIndexes)
     {
-        electrodes[i]->setColour(ColourScheme::getColourForNormalizedValue((float)(peakToPeakValues[i] / maxValue)));
+        electrodes[electrodeIndex]->setColour(ColourScheme::getColourForNormalizedValue((float)(peakToPeakValues[electrodeIndex] / maxValue)));
+        count += 1;
     }
-
-    
     
 }
 
@@ -91,6 +91,7 @@ void UG3GridDisplay::updateSelectedElectrodes (std::set<int>& newValues, bool is
         for(int index : newValues) {
             electrodes[index] -> setColour(ColourScheme::getColourForNormalizedValue(.9));
         }
+        selectedElectrodeIndexes.insert(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end());
         highlightedElectrodeIndexes.clear();
     }
     else {
