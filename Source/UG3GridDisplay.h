@@ -12,6 +12,7 @@
 #include <VisualizerWindowHeaders.h>
 #include <stack>
 #include <map>
+#include <set>
 
 #include "ColourScheme.h"
 
@@ -25,6 +26,8 @@ public:
     Electrode() : c(Colours::grey) { }
 
     void setColour(Colour c);
+    
+    Colour getColour();
 
     void paint(Graphics& g);
 
@@ -47,7 +50,7 @@ public:
     
     int getTotalHeight() {return totalHeight;}
     
-    void updateSelectedElectrodes (std::stack<int>& newValues);
+    void updateSelectedElectrodes (std::set<int>& newValues, bool isFilled = false);
     
     class DisplayMouseListener : public Component {
     public:
@@ -55,7 +58,7 @@ public:
         void mouseDown(const MouseEvent & event);
         void mouseDrag(const MouseEvent & event);
         void mouseUp(const MouseEvent & event);
-        void calculateElectrodesSelected();
+        void calculateElectrodesSelected(bool isFilled = false);
         
         void paint(Graphics& g);
 
@@ -84,6 +87,7 @@ private:
     Viewport* viewport;
     OwnedArray<Electrode> electrodes;
     ScopedPointer<DisplayMouseListener> mouseListener;
+    std::set<int> highlightedElectrodeIndexes;
     
     int totalHeight;
     
