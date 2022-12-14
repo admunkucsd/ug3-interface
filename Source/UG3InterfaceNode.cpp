@@ -26,7 +26,7 @@ ActivityDataContainer::ActivityDataContainer(int numChannels, int updateInterval
 }
 
 const float* ActivityDataContainer::getPeakToPeakValues() {
-
+    std::cout << "p2p[0]: " << peakToPeakValues[0] << std::endl;
     return peakToPeakValues.getRawDataPointer();
 }
 
@@ -141,6 +141,19 @@ void UG3InterfaceNode::resizeChanSamp()
     timestamps.clear();
     timestamps.insertMultiple(0, 0.0, num_samp);
     ttlEventWords.resize(num_channels);
+    
+    //Needs to set processor output bus channel count
+    juce::AudioProcessor::Bus* outputBus;
+    for(int i = 0; i < sn ->getBusCount(false); i++) {
+        juce::AudioProcessor::Bus* currentBus = sn->getBus(false, i);
+        if(currentBus->getName() == "Output") {
+            outputBus = currentBus;
+            break;
+        }
+    }
+    outputBus -> setNumberOfChannels(num_channels);
+    //Needs to call update settings, dataStream channel count not set
+    sn->updateSettings();
 }
 
 int UG3InterfaceNode::getNumChannels() const
@@ -259,6 +272,9 @@ bool UG3InterfaceNode::updateBuffer()
 
     }
 
+    
+    std::cout << "convbuf[0]: " << convbuf[0] << " convbuf[1]: "<< convbuf[1] << std::endl;
+    
     sourceBuffers[0]->addToBuffer(convbuf,
         sampleNumbers.getRawDataPointer(),
         timestamps.getRawDataPointer(),
@@ -291,7 +307,6 @@ bool UG3InterfaceNode::updateBuffer()
         total_samples = 0;
         lastTimerCallback = Time::getHighResolutionTicks();
     }
-    
     return true;
 }
 

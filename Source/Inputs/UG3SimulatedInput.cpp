@@ -95,13 +95,6 @@ void UG3SimulatedInput::setIndexes(std::set<int> indexes){
 void UG3SimulatedInput::makeColorWave() {
     for(int sampleIndex = 0; sampleIndex < samples; sampleIndex++) {
         if(sampleIndex % 2) {
-            /*
-            for(int y = 0; y < channelsY; y++) {
-                for(int x = 0; x < channelsX; x++) {
-                    simulatedValues[x + y*channelsX + channelsX*channelsY * sampleIndex] = (maxValue/channelsX * x + (waveIndex * maxValue/channelsX)) % maxValue;
-                }
-            }
-            */
             int count = 0;
             for(int index : indexes) {
                 simulatedValues[count] = (maxValue/channelsX * index % channelsX + (waveIndex * maxValue/channelsX)) % maxValue;
@@ -109,7 +102,7 @@ void UG3SimulatedInput::makeColorWave() {
             }
         }
         else {
-            //memset(simulatedValues+indexes.size()*sizeof(simulatedValues)*sampleIndex, 0, indexes.size()*sizeof(*simulatedValues));
+            memset(simulatedValues+indexes.size()*sizeof(simulatedValues)*sampleIndex, 0, indexes.size()*sizeof(simulatedValues));
         }
     }
     waveIndex = (waveIndex + 1) % channelsX;
