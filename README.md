@@ -1,8 +1,8 @@
-# Ephys Socket
+# UG3 Interface
 
 ![ephys-socket-screenshot](Resources/ephys-socket.png)
 
-A simple UDP server for receiving raw matrix data. It can be used to stream data from the `OpenCVMatSocket` in [Bonsai](https://bonsai-rx.org).
+A DataThread plugin used to connect to and acquire data from the UG3 head worn unit.
 
 ## Installation
 
@@ -82,4 +82,4 @@ Running the `ALL_BUILD` scheme will compile the plugin; running the `INSTALL` sc
 
 ## Attribution
 
-Developed by Jonathan Newman ([@jonnew](https://github.com/jonnew)).
+Developed by Allen Munk ([@admunkucsd](https://github.com/admunkucsd)).

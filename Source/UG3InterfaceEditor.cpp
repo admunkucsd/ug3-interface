@@ -103,7 +103,7 @@ void UG3InterfaceEditor::populateInputs ()
 
 Visualizer* UG3InterfaceEditor::createNewCanvas()
 {
-    return new UG3InterfaceCanvas(node, node->num_channels, node->getInputMaxValue());
+    return new UG3InterfaceCanvas(node, this, node->num_channels, node->getInputMaxValue());
 }
 
 void UG3InterfaceEditor::saveCustomParametersToXml(XmlElement* xmlNode)

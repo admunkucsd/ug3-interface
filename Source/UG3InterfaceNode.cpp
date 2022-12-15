@@ -12,7 +12,7 @@
 #include "Inputs/UG3SimulatedInput.h"
 
 #include <thread>
-
+#include <queue>
 using namespace UG3Interface;
 
 ActivityDataContainer::ActivityDataContainer(int numChannels, int updateInterval_)
@@ -57,7 +57,7 @@ void ActivityDataContainer::addSample(float sample, int channel)
 
 }
 
-void ActivityDataContainer::reset()
+void ActivityDataContainer::reset(bool isFullClear)
 {
 
     //std::cout << "Reset." << std::endl;
@@ -65,7 +65,7 @@ void ActivityDataContainer::reset()
     for (int i = 0; i < peakToPeakValues.size(); i++)
     {
 
-        peakToPeakValues.set(i, maxChannelValues[i] - minChannelValues[i]);
+        peakToPeakValues.set(i, isFullClear ? 0 : maxChannelValues[i] - minChannelValues[i] );
         
         minChannelValues.set(i, 999999.9f);
         maxChannelValues.set(i, -999999.9f);
@@ -74,6 +74,7 @@ void ActivityDataContainer::reset()
     counter = 0;
 
 }
+
 
 std::vector<String> UG3InterfaceNode::getInputNames() {
     return inputNames;
@@ -127,33 +128,44 @@ UG3InterfaceNode::~UG3InterfaceNode()
     free(convbuf);
 }
 
+void UG3InterfaceNode::dumpGridIndexes(std::queue<int> indexes) {
+    
+    for(int i = 0; i < num_channels_y; i++) {
+        for(int j = 0; j < num_channels_x; j++) {
+            if(j + i*num_channels_x == indexes.front()){
+                std::cout << ".";
+                indexes.pop();
+            }
+            else {
+                std::cout << "#";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
+
 void UG3InterfaceNode::setInputIndexes(std::set<int> indexes) {
+    std::queue<int> queueIndexes;
+    for(auto index : indexes) {
+        queueIndexes.push(index);
+    }
+    dumpGridIndexes(queueIndexes);
     input -> setIndexes(indexes);
 }
 
 
 void UG3InterfaceNode::resizeChanSamp()
 {
-    sourceBuffers[0]->resize(num_channels, 10000);
-    recvbuf = (uint16_t *)realloc(recvbuf, num_channels * num_samp * 2);
-    convbuf = (float *)realloc(convbuf, num_channels * num_samp * 4);
+    //sourceBuffers[0]->resize(num_channels, 10000);
+    //recvbuf = (uint16_t *)realloc(recvbuf, num_channels * num_samp * 2);
+    //convbuf = (float *)realloc(convbuf, num_channels * num_samp * 4);
     sampleNumbers.resize(num_channels);
     timestamps.clear();
     timestamps.insertMultiple(0, 0.0, num_samp);
     ttlEventWords.resize(num_channels);
+    activityDataContainer -> reset(true);
     
-    //Needs to set processor output bus channel count
-    juce::AudioProcessor::Bus* outputBus;
-    for(int i = 0; i < sn ->getBusCount(false); i++) {
-        juce::AudioProcessor::Bus* currentBus = sn->getBus(false, i);
-        if(currentBus->getName() == "Output") {
-            outputBus = currentBus;
-            break;
-        }
-    }
-    outputBus -> setNumberOfChannels(num_channels);
-    //Needs to call update settings, dataStream channel count not set
-    sn->updateSettings();
 }
 
 int UG3InterfaceNode::getNumChannels() const
@@ -168,7 +180,7 @@ void UG3InterfaceNode::updateSettings(OwnedArray<ContinuousChannel>* continuousC
     OwnedArray<DeviceInfo>* devices,
     OwnedArray<ConfigurationObject>* configurationObjects)
 {
-
+    std::cout <<" updated settings" << std::endl;
     continuousChannels->clear();
     eventChannels->clear();
     devices->clear();
@@ -223,7 +235,7 @@ bool UG3InterfaceNode::foundInputSource()
 
 bool UG3InterfaceNode::startAcquisition()
 {
-    resizeChanSamp();
+    //resizeChanSamp();
 
     total_samples = 0;
 
@@ -273,7 +285,7 @@ bool UG3InterfaceNode::updateBuffer()
     }
 
     
-    std::cout << "convbuf[0]: " << convbuf[0] << " convbuf[1]: "<< convbuf[1] << std::endl;
+    //std::cout << "convbuf[0]: " << convbuf[0] << " convbuf[1]: "<< convbuf[1] << std::endl;
     
     sourceBuffers[0]->addToBuffer(convbuf,
         sampleNumbers.getRawDataPointer(),

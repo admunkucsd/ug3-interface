@@ -33,8 +33,8 @@ namespace UG3Interface
         void addSample(float sample, int channel);
 
         /** Reset min/max values*/
-        void reset();
-
+        void reset(bool isFullClear = false);
+        
     private:
 
         Array<float> minChannelValues;
@@ -83,6 +83,7 @@ namespace UG3Interface
 
         void resizeChanSamp();
         
+        void dumpGridIndexes(std::queue<int> indexes);
         void setInputIndexes(std::set<int> indexes);
         
         /**Used to calculate the maximum value for a given input bit width**/

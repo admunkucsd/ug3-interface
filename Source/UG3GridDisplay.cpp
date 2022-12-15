@@ -27,18 +27,11 @@ Colour Electrode::getColour() {
 }
 
 UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannels) : canvas(canvas), viewport(viewport), numChannels(numChannels), totalHeight(0){
+    int newTotalHeight = 0;
+    const int totalPixels = numChannels;
     selectedColor = ColourScheme::getColourForNormalizedValue(.9);
     highlightedColor = selectedColor.withAlpha(float(0.7));
-}
-
-
-void UG3GridDisplay::resized() {
-    int newTotalHeight = 0;
-    electrodes.clear();
-    mouseListener = nullptr;
-    const int totalPixels = numChannels;
-    LOGC("Total pixels: ", totalPixels);
-
+    
     const int NUM_COLUMNS = sqrt(numChannels);
     
     newTotalHeight = TOP_BOUND;
@@ -63,12 +56,27 @@ void UG3GridDisplay::resized() {
         addAndMakeVisible(e);
         electrodes.add(e);
     }
+    
+    mouseListener = new DisplayMouseListener(this, sqrt(numChannels));
+    mouseListener -> setBounds(0,0, getWidth(), getHeight());
+    addAndMakeVisible(mouseListener);
+    mouseListener -> toFront(true);
+        
+    totalHeight = newTotalHeight + TOP_BOUND - SPACING;
+
+    
+}
+
+
+void UG3GridDisplay::resized() {
+    mouseListener = nullptr;
+
+    
     mouseListener = new DisplayMouseListener(this, sqrt(numChannels));
     mouseListener -> setBounds(0,0, getWidth(), getHeight());
     addAndMakeVisible(mouseListener);
     mouseListener -> toFront(true);
     
-    totalHeight = newTotalHeight + TOP_BOUND - SPACING;
 }
 
 void UG3GridDisplay::paint(Graphics& g){
@@ -82,7 +90,7 @@ void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue)
     int count = 0;
     for (int electrodeIndex : selectedElectrodeIndexes)
     {
-        electrodes[electrodeIndex]->setColour(ColourScheme::getColourForNormalizedValue((float)(peakToPeakValues[electrodeIndex] / maxValue)));
+        electrodes[electrodeIndex]->setColour(ColourScheme::getColourForNormalizedValue((float)(peakToPeakValues[count] / maxValue)));
         count += 1;
     }
     

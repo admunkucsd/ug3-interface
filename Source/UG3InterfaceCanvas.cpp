@@ -39,8 +39,8 @@ using namespace UG3Interface;
 
 #pragma mark - UG3InterfaceCanvas -
 
-UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, int numChannels, unsigned long long inputMaxValue)
-    : node(node_), numChannels(numChannels), inputMaxValue(inputMaxValue)
+UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, UG3InterfaceEditor* editor, int numChannels, unsigned long long inputMaxValue)
+    : node(node_), editor(editor),numChannels(numChannels), inputMaxValue(inputMaxValue)
 {
     refreshRate = 30;
     
@@ -148,6 +148,7 @@ void UG3InterfaceCanvas::setNodeNumChannels(std::set<int> indexes) {
     node->num_channels = indexes.size();
     node->resizeChanSamp();
     node->setInputIndexes(indexes);
+    CoreServices::updateSignalChain(editor);
 }
 
 

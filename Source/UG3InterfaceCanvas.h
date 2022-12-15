@@ -38,7 +38,7 @@ class UG3InterfaceCanvas : public Visualizer,
 public:
 
     /** Constructor */
-    UG3InterfaceCanvas(class UG3InterfaceNode*, int numChannels, unsigned long long inputMaxValue = 0xffff);
+    UG3InterfaceCanvas(class UG3InterfaceNode*, class UG3InterfaceEditor*, int numChannels, unsigned long long inputMaxValue = 0xffff);
 
     /** Destructor */
     virtual ~UG3InterfaceCanvas() override;
@@ -87,6 +87,7 @@ public:
 
 private:
     class UG3InterfaceNode* node;
+    class UG3InterfaceEditor* editor;
 
     std::unique_ptr<class UG3InterfaceViewport> viewport;
     std::unique_ptr<UG3GridDisplay> gridDisplay;
