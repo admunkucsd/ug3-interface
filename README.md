@@ -1,16 +1,18 @@
 # UG3 Interface
 
-![ephys-socket-screenshot](Resources/ephys-socket.png)
+![ephys-socket-screenshot](Resources/ug3-grid.png)
 
-A DataThread plugin used to connect to and acquire data from the UG3 head worn unit.
+A DataThread plugin used to connect to and acquire data from the UG3 head worn unit. This plugin provides socket connectivity to connect to the UG3 hardware or simulated data for debug. This plugin also provides a grid view which can be used to monitor incoming data or select a subset of channels.
 
 ## Installation
 
-This plugin can be added via the Open Ephys GUI Plugin Installer. To access the Plugin Installer, press **ctrl-P** or **⌘P** from inside the GUI. Once the installer is loaded, browse to the "Ephys Socket" plugin and click "Install."
+This plugin can only be added by cloning this repo and building from source. A guide on building from source as well as a link to the Open Ephys developer guide are provided below
 
 ## Usage
 
-Instructions for using the Ephys Socket plugin are available [here](https://open-ephys.github.io/gui-docs/User-Manual/Plugins/Ephys-Socket.html).
+This plugin's data input is controlled by the editor within the signal chain. Currently the only 2 supported data inputs are socket or simulated data.
+
+Within the grid visualizer, users can select different input-specific configuriation opens along the button bar. Users can then select which electrodes they wish to sample by either clicking on an individual electrode, or click-and-dragging their mouse to make a larger selection.
 
 ## Building from source
 
