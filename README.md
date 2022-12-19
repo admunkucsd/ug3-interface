@@ -1,6 +1,6 @@
 # UG3 Interface
 
-![ephys-socket-screenshot](Resources/ug3-grid.png)
+![ug3-grid-screenshot](Resources/ug3-grid.png)
 
 A DataThread plugin used to connect to and acquire data from the UG3 head worn unit. This plugin provides socket connectivity to connect to the UG3 hardware or simulated data for debug. This plugin also provides a grid view which can be used to monitor incoming data or select a subset of channels.
 
@@ -29,7 +29,7 @@ Code
 │   ├── Source
 │   └── ...
 ├── OEPlugins
-│   └── ephys-socket
+│   └── ug3-interface
 │       ├── Build
 │       ├── Source
 │       └── ...
@@ -45,9 +45,9 @@ From the `Build` directory, enter:
 cmake -G "Visual Studio 17 2022" -A x64 ..
 ```
 
-Next, launch Visual Studio and open the `OE_PLUGIN_ephys-socket.sln` file that was just created. Select the appropriate configuration (Debug/Release) and build the solution.
+Next, launch Visual Studio and open the `OE_PLUGIN_ug3-interface.sln` file that was just created. Select the appropriate configuration (Debug/Release) and build the solution.
 
-Selecting the `INSTALL` project and manually building it will copy the `.dll` and any other required files into the GUI's `plugins` directory. The next time you launch the GUI from Visual Studio, the Ephys Socket plugin should be available.
+Selecting the `INSTALL` project and manually building it will copy the `.dll` and any other required files into the GUI's `plugins` directory. The next time you launch the GUI from Visual Studio, the UG3 Interface plugin should be available.
 
 
 ### Linux
@@ -63,7 +63,7 @@ make -j
 make install
 ```
 
-This will build the plugin and copy the `.so` file into the GUI's `plugins` directory. The next time you launch the GUI compiled version of the GUI, the Ephys Socket plugin should be available.
+This will build the plugin and copy the `.so` file into the GUI's `plugins` directory. The next time you launch the GUI compiled version of the GUI, the UG3 Interface plugin should be available.
 
 
 ### macOS
@@ -76,9 +76,9 @@ From the `Build` directory, enter:
 cmake -G "Xcode" ..
 ```
 
-Next, launch Xcode and open the `ephys-socket.xcodeproj` file that now lives in the “Build” directory.
+Next, launch Xcode and open the `ug3-interface.xcodeproj` file that now lives in the “Build” directory.
 
-Running the `ALL_BUILD` scheme will compile the plugin; running the `INSTALL` scheme will install the `.bundle` file to `/Users/<username>/Library/Application Support/open-ephys/plugins-api`. The Ephys Socket plugin should be available the next time you launch the GUI from Xcode.
+Running the `ALL_BUILD` scheme will compile the plugin; running the `INSTALL` scheme will install the `.bundle` file to `/Users/<username>/Library/Application Support/open-ephys/plugins-api`. The UG3 Interface plugin should be available the next time you launch the GUI from Xcode.
 
 
 
