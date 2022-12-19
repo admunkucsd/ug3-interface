@@ -26,7 +26,6 @@ ActivityDataContainer::ActivityDataContainer(int numChannels, int updateInterval
 }
 
 const float* ActivityDataContainer::getPeakToPeakValues() {
-    std::cout << "p2p[0]: " << peakToPeakValues[0] << std::endl;
     return peakToPeakValues.getRawDataPointer();
 }
 
@@ -73,6 +72,16 @@ void ActivityDataContainer::reset(bool isFullClear)
 
     counter = 0;
 
+}
+
+void ActivityDataContainer::resize(int channelNum) {
+    peakToPeakValues.resize(channelNum);
+    peakToPeakValues.fill(0);
+    minChannelValues.resize(channelNum);
+    minChannelValues.fill(999999.9f);
+    maxChannelValues.resize(channelNum);
+    maxChannelValues.fill(-999999.9f);
+    counter = 0;
 }
 
 
@@ -146,12 +155,9 @@ void UG3InterfaceNode::dumpGridIndexes(std::queue<int> indexes) {
 
 
 void UG3InterfaceNode::setInputIndexes(std::set<int> indexes) {
-    std::queue<int> queueIndexes;
-    for(auto index : indexes) {
-        queueIndexes.push(index);
-    }
-    dumpGridIndexes(queueIndexes);
+
     input -> setIndexes(indexes);
+    this -> indexes = indexes;
 }
 
 
@@ -164,7 +170,10 @@ void UG3InterfaceNode::resizeChanSamp()
     timestamps.clear();
     timestamps.insertMultiple(0, 0.0, num_samp);
     ttlEventWords.resize(num_channels);
-    activityDataContainer -> reset(true);
+    activityDataContainer -> resize(num_channels);
+    memset(recvbuf, 0, num_channels*num_samp*2);
+    memset(convbuf, 0, num_channels*num_samp*4);
+
     
 }
 
@@ -275,7 +284,7 @@ bool UG3InterfaceNode::updateBuffer()
     int k = 0;
     for (int i = 0; i < num_samp; i++) {
         for (int j = 0; j < num_channels; j++) {
-            convbuf[k] =(float)(recvbuf[i*num_channels + j]);
+            convbuf[k] = (float)(recvbuf[i*num_channels + j]);
             activityDataContainer->addSample(convbuf[k],j);
             k+=1;
         }

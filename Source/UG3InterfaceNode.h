@@ -35,6 +35,8 @@ namespace UG3Interface
         /** Reset min/max values*/
         void reset(bool isFullClear = false);
         
+        void resize(int channelNum);
+        
     private:
 
         Array<float> minChannelValues;
@@ -140,6 +142,8 @@ namespace UG3Interface
 
         int64 lastTimerCallback;
         int64 lastBufferUpdate;
+        int64 lastWrite;
+        std::set<int> indexes;
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(UG3InterfaceNode);
     };

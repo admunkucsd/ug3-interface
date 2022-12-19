@@ -96,7 +96,6 @@ private:
     Colour highlightedColor;
     
     int totalHeight;
-    
 
     
 };

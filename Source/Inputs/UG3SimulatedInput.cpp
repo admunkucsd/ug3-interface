@@ -89,35 +89,30 @@ bool UG3SimulatedInput::reconnect(){
 void UG3SimulatedInput::setIndexes(std::set<int> indexes){
     //simulatedValues = (uint16_t *)realloc(simulatedValues, indexes.size() * samples * 2);
     this->indexes = indexes;
+    waveIndex = 0;
 }
 
 
 void UG3SimulatedInput::makeColorWave() {
     for(int sampleIndex = 0; sampleIndex < samples; sampleIndex++) {
-        if(sampleIndex % 2) {
-            int count = 0;
-            for(int index : indexes) {
-                simulatedValues[count + sampleIndex * indexes.size()] = (maxValue/channelsX * (index % channelsX) + (waveIndex * maxValue/channelsX)) % maxValue;
-                count++;
-            }
+        int count = 0;
+        for(int index : indexes) {
+            simulatedValues[count + sampleIndex * indexes.size()] = sampleIndex % 2 ? (maxValue/channelsX * (index % channelsX) + (waveIndex * maxValue/channelsX)) % maxValue : 0;
+            count++;
         }
-        else {
-            memset(simulatedValues+indexes.size()*sizeof(simulatedValues)*sampleIndex, 0, indexes.size()*sizeof(simulatedValues));
-        }
-    }
+}
     waveIndex = (waveIndex + 1) % channelsX;
 }
 
 
 void UG3SimulatedInput::makeSine(){
     for(int sampleIndex = 0; sampleIndex < samples; sampleIndex++) {
-        for(int y = 0; y < channelsY; y++) {
-            for(int x = 0; x < channelsX; x++) {
-                float radian = simPi*2*sampleIndex/(samples*sinePhaseShiftConstant)+simPi*2*waveIndex/sinePhaseShiftConstant;
-                float sinVal = sin(radian);
-                simulatedValues[x + y*channelsX + channelsX*channelsY * sampleIndex] = sinVal * 5000 + 5000;
-              
-            }
+        int count = 0;
+        for(int index : indexes) {
+            float radian = simPi*2*sampleIndex/(samples*sinePhaseShiftConstant)+simPi*2*waveIndex/sinePhaseShiftConstant;
+            float sinVal = sin(radian);
+            simulatedValues[count + sampleIndex * indexes.size()] = sinVal * 5000 + 5000;
+            count++;
         }
     }
     waveIndex = (waveIndex + 1) % sinePhaseShiftConstant;
