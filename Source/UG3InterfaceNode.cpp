@@ -164,8 +164,8 @@ void UG3InterfaceNode::setInputIndexes(std::set<int> indexes) {
 void UG3InterfaceNode::resizeChanSamp()
 {
     //sourceBuffers[0]->resize(num_channels, 10000);
-    //recvbuf = (uint16_t *)realloc(recvbuf, num_channels * num_samp * 2);
-    //convbuf = (float *)realloc(convbuf, num_channels * num_samp * 4);
+    recvbuf = (uint16_t *)realloc(recvbuf, num_channels * num_samp * 2);
+    convbuf = (float *)realloc(convbuf, num_channels * num_samp * 4);
     sampleNumbers.resize(num_channels);
     timestamps.clear();
     timestamps.insertMultiple(0, 0.0, num_samp);

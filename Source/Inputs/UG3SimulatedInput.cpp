@@ -87,7 +87,7 @@ bool UG3SimulatedInput::reconnect(){
 }
 
 void UG3SimulatedInput::setIndexes(std::set<int> indexes){
-    //simulatedValues = (uint16_t *)realloc(simulatedValues, indexes.size() * samples * 2);
+    simulatedValues = (uint16_t *)realloc(simulatedValues, indexes.size() * samples * 2);
     this->indexes = indexes;
     waveIndex = 0;
 }
