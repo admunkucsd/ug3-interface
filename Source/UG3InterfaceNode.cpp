@@ -106,7 +106,8 @@ UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     sample_rate(DEFAULT_SAMPLE_RATE),
     bitWidth(DEFAULT_CHANNEL_BITWIDTH),
     lastBufferUpdate(-1),
-    lastTimerCallback(0)
+    lastTimerCallback(0),
+    num_sections(DEFAULT_NUM_SECTIONS)
 {
     //FIXME: Use editor ComboBox to determine input
     //input = new UG3Socket(false, 0,0);

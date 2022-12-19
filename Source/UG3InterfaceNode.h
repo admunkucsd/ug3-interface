@@ -11,6 +11,7 @@ const int DEFAULT_NUM_SAMPLES = 10;
 const int DEFAULT_NUM_CHANNELS_X = 64;
 const int DEFAULT_NUM_CHANNELS_Y = 64;
 const uint8_t DEFAULT_CHANNEL_BITWIDTH = 16;
+const int DEFAULT_NUM_SECTIONS = 4;
 
 namespace UG3Interface
 {
@@ -76,6 +77,7 @@ namespace UG3Interface
         int num_channels;
         int num_channels_x;
         int num_channels_y;
+        int num_sections;
 
 
         int64 total_samples;

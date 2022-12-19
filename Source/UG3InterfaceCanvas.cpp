@@ -39,14 +39,14 @@ using namespace UG3Interface;
 
 #pragma mark - UG3InterfaceCanvas -
 
-UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, UG3InterfaceEditor* editor, int numChannels, unsigned long long inputMaxValue)
-    : node(node_), editor(editor),numChannels(numChannels), inputMaxValue(inputMaxValue)
+UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, UG3InterfaceEditor* editor, unsigned long long inputMaxValue)
+    : node(node_), editor(editor), inputMaxValue(inputMaxValue)
 {
     refreshRate = 30;
     
     viewport = std::make_unique<UG3InterfaceViewport>(this);
 
-    gridDisplay = std::make_unique<UG3GridDisplay>(this, viewport.get(), numChannels);
+    gridDisplay = std::make_unique<UG3GridDisplay>(this, viewport.get(), node->num_channels_x, node->num_channels_y, node->num_sections, 4096);
     
     viewport->setViewedComponent(gridDisplay.get(), false);
     viewport->setScrollBarsShown(true, true, true, true);
@@ -124,7 +124,6 @@ void UG3InterfaceCanvas::resized()
     viewport->setBounds(0, 0, getWidth(), getHeight()-30); // leave space at bottom for buttons
 
     gridDisplay->setBounds(0,0, std::max(gridDisplay->getTotalHeight(), getWidth() - scrollBarThickness), std::max(gridDisplay->getTotalHeight(), getHeight() - 30));
-        
     node->resizeCanvasComponents(componentsEndX, getHeight());
 
 }

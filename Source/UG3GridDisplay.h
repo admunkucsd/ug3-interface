@@ -39,7 +39,7 @@ private:
 
 class UG3GridDisplay : public Component{
 public:
-    UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannels);
+    UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannelsX, int numChannelsY, int numSections, int maxSelectedChannels);
         
     void refresh(const float * peakToPeakValues, int const maxValue);
     
@@ -52,11 +52,13 @@ public:
     
     void updateSelectedElectrodes (std::set<int>& newValues, bool isFilled = false);
     
+    void updateChannelCountLabels();
+    
     std::set<int> getSelectedElectrodeIndexes(){return selectedElectrodeIndexes;}
     
     class DisplayMouseListener : public Component {
     public:
-        DisplayMouseListener(UG3GridDisplay* display, int numRows);
+        DisplayMouseListener(UG3GridDisplay* display, int numRows, int numSections);
         void mouseDown(const MouseEvent & event);
         void mouseDrag(const MouseEvent & event);
         void mouseUp(const MouseEvent & event);
@@ -71,6 +73,7 @@ public:
         int selectionStartX;
         int selectionStartY;
         int numRows;
+        int numSections;
 
     };
 
@@ -81,19 +84,25 @@ protected:
     const static int SPACING = 4;
     const static int HEIGHT = 8;
     const static int WIDTH = 8;
-    int numChannels;
-
+    const static int SECTION_SPACING = 9;
+    int numChannelsX;
+    int numChannelsY;
+    int numSections;
+    int maxSelectedChannels;
     
 private:
     UG3InterfaceCanvas* canvas;
     Viewport* viewport;
     OwnedArray<Electrode> electrodes;
+    OwnedArray<Rectangle<int>> sectionDividers;
     ScopedPointer<DisplayMouseListener> mouseListener;
     std::set<int> highlightedElectrodeIndexes;
     std::set<int> selectedElectrodeIndexes;
     
     Colour selectedColor;
     Colour highlightedColor;
+    
+    OwnedArray<Label> channelCountLabels;
     
     int totalHeight;
 

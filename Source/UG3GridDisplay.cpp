@@ -26,24 +26,33 @@ Colour Electrode::getColour() {
     return c;
 }
 
-UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannels) : canvas(canvas), viewport(viewport), numChannels(numChannels), totalHeight(0){
+UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannelsX, int numChannelsY, int numSections, int maxSelectedChannels) : canvas(canvas), viewport(viewport), numChannelsX(numChannelsX), numChannelsY(numChannelsY), numSections(numSections), totalHeight(0), maxSelectedChannels(maxSelectedChannels){
     int newTotalHeight = 0;
-    const int totalPixels = numChannels;
+    const int totalPixels = numChannelsX * numChannelsY;
     selectedColor = ColourScheme::getColourForNormalizedValue(.9);
     highlightedColor = selectedColor.withAlpha(float(0.7));
-    
-    const int NUM_COLUMNS = sqrt(numChannels);
-    
+        
     newTotalHeight = TOP_BOUND;
     
     for (int i = 0; i < totalPixels; i++)
     {
         Electrode* e = new Electrode();
 
-        int column = i % NUM_COLUMNS;
-        int row = i / NUM_COLUMNS;
-        int L = LEFT_BOUND + column * (WIDTH + SPACING);
+        int column = i % numChannelsX;
+        int row = i / numChannelsX;
+        int L = LEFT_BOUND + column * (WIDTH + SPACING) + (SECTION_SPACING - SPACING) * (column/(numChannelsX/numSections));
         int T = TOP_BOUND + row * (HEIGHT + SPACING);
+        
+        if(column % (numChannelsX/numSections) == 0 && row == 0){
+            int index = column /(numChannelsX/numSections);
+            Label* newLabel = new Label(String("Channel Count ") + String(index), String(0)+String("/")+String(maxSelectedChannels/numSections));
+            newLabel->setFont(Font("Small Text", 16, Font::plain));
+            newLabel->setColour(Label::textColourId, Colours::white);
+            newLabel->setBounds(L, TOP_BOUND/4, 65, TOP_BOUND * 3/4);
+            addAndMakeVisible(newLabel);
+            channelCountLabels.add(newLabel);
+        }
+            
 
         if(column == 0)
             newTotalHeight += HEIGHT + SPACING;
@@ -57,7 +66,14 @@ UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, i
         electrodes.add(e);
     }
     
-    mouseListener = new DisplayMouseListener(this, sqrt(numChannels));
+    for( int i = 0; i < numSections - 1; i++ ) {
+        int startX = LEFT_BOUND + numChannelsX/numSections * (WIDTH + SECTION_SPACING/2) + i * (SECTION_SPACING/2 + (SECTION_SPACING%2 ? 1 : 0) + ((WIDTH + SPACING) * numChannelsX/numSections));
+        int dividerHeight = TOP_BOUND + numChannelsY * (HEIGHT+SPACING) - SPACING;
+        Rectangle<int> * sectionDivider = new Rectangle<int>(startX, TOP_BOUND/2, 1, dividerHeight);
+        sectionDividers.add(sectionDivider);
+    }
+    
+    mouseListener = new DisplayMouseListener(this, numChannelsX, numSections);
     mouseListener -> setBounds(0,0, getWidth(), getHeight());
     addAndMakeVisible(mouseListener);
     mouseListener -> toFront(true);
@@ -72,7 +88,7 @@ void UG3GridDisplay::resized() {
     mouseListener = nullptr;
 
     
-    mouseListener = new DisplayMouseListener(this, sqrt(numChannels));
+    mouseListener = new DisplayMouseListener(this, numChannelsX, numSections);
     mouseListener -> setBounds(0,0, getWidth(), getHeight());
     addAndMakeVisible(mouseListener);
     mouseListener -> toFront(true);
@@ -81,11 +97,13 @@ void UG3GridDisplay::resized() {
 
 void UG3GridDisplay::paint(Graphics& g){
     g.fillAll(Colours::darkgrey);
+    for(Rectangle<int>* divider: sectionDividers) {
+        g.drawRect(*divider);
+    }
     
 }
 
 void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue) {
-    int maxChan = jmin(electrodes.size(), numChannels);
     
     int count = 0;
     for (int electrodeIndex : selectedElectrodeIndexes)
@@ -103,6 +121,7 @@ void UG3GridDisplay::updateSelectedElectrodes (std::set<int>& newValues, bool is
         }
         selectedElectrodeIndexes.insert(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end());
         highlightedElectrodeIndexes.clear();
+        updateChannelCountLabels();
         canvas->setNodeNumChannels(selectedElectrodeIndexes);
     }
     else {
@@ -126,7 +145,20 @@ void UG3GridDisplay::updateSelectedElectrodes (std::set<int>& newValues, bool is
 }
 
 
-UG3GridDisplay::DisplayMouseListener::DisplayMouseListener(UG3GridDisplay* display, int numRows) : display(display), numRows(numRows){}
+void UG3GridDisplay::updateChannelCountLabels(){
+    std::vector<int> counts(numSections, 0);
+    for(int index: selectedElectrodeIndexes) {
+        counts[(index % numChannelsX)/(numChannelsX/numSections)] += 1;
+    }
+    int labelIndex = 0;
+    for(int count : counts) {
+        std::cout << "count" <<labelIndex << ": " << count << std::endl;
+        channelCountLabels[labelIndex] -> setText(String(count)+String("/")+String(maxSelectedChannels/numSections),dontSendNotification);
+        labelIndex += 1;
+    }
+}
+
+UG3GridDisplay::DisplayMouseListener::DisplayMouseListener(UG3GridDisplay* display, int numRows, int numSections) : display(display), numRows(numRows), numSections(numSections) {}
 
 void UG3GridDisplay::DisplayMouseListener::paint(Graphics& g){
     g.fillAll(Colours::transparentWhite);
@@ -136,13 +168,23 @@ void UG3GridDisplay::DisplayMouseListener::paint(Graphics& g){
 
 void UG3GridDisplay::DisplayMouseListener::calculateElectrodesSelected(bool isFilled){
     
-    int maxX = LEFT_BOUND + (WIDTH + SPACING) * numRows - SPACING;
+    int maxX = LEFT_BOUND + (WIDTH + SPACING) * numRows - SPACING + (numSections - 1) * (SECTION_SPACING - SPACING);
     int maxY = TOP_BOUND + (HEIGHT + SPACING) * numRows - SPACING;
 
+    int colsPerSection = numRows/numSections;
+    int widthOfSection = (WIDTH+SPACING)*colsPerSection - SPACING + SECTION_SPACING;
+    int numSectionsLeftOfX = std::min((selection -> getX() - LEFT_BOUND)/widthOfSection, numSections - 1);
+    int startOfLeftMostSection = widthOfSection * numSectionsLeftOfX;
+    int numEdgesInCurrentSection = selection -> getX() >= LEFT_BOUND ? std::min(((selection -> getX() - LEFT_BOUND) - startOfLeftMostSection) / (WIDTH + SPACING), colsPerSection - 1) : 0;
+    int nearestLeftEdge = numSectionsLeftOfX * colsPerSection + numEdgesInCurrentSection;
+    int numSectionsLeftOfRightSelection = std::min((selection -> getTopRight().getX() - LEFT_BOUND)/widthOfSection, numSections - 1);
+    int startOfLeftMostSectionOfRightSelection= widthOfSection * numSectionsLeftOfRightSelection;
+    int numEdgesInCurrentSectionOfRightSelection = std::min(((selection -> getTopRight().getX() - LEFT_BOUND) - startOfLeftMostSectionOfRightSelection) / (WIDTH + SPACING) + 1, colsPerSection);
+    int nearestLeftEdgeOfRightSelection = numSectionsLeftOfRightSelection * colsPerSection + numEdgesInCurrentSectionOfRightSelection;
     //Calculate the nearest left edge of an electrode (to the left of the selection left boundary)
-    int nearestLeftEdge = selection -> getX() - LEFT_BOUND >= 0 ? (selection -> getX() - LEFT_BOUND)/(WIDTH+SPACING) : 0;
     //Calculate the number of columns selected by calculating the number of left edges present in selection from nLE to top right of selection
-    int columnsSelected = selection -> getTopRight().getX() > LEFT_BOUND && selection -> getX() < maxX ? (std::min((int)selection -> getTopRight().getX(), maxX) - (LEFT_BOUND + nearestLeftEdge*(WIDTH+SPACING)))/(WIDTH+SPACING) + 1 : 0;
+    int columnsSelected = selection -> getTopRight().getX() > LEFT_BOUND && selection -> getX() < maxX ? nearestLeftEdgeOfRightSelection - nearestLeftEdge: 0;
+    
     
     //Calculate the nearest top edge of an electrode (to the top of selection top boundary)
     int nearestTopEdge = selection -> getY() - TOP_BOUND >= 0 ? (selection -> getY() - TOP_BOUND)/(HEIGHT+SPACING) : 0;
