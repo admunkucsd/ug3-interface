@@ -21,6 +21,8 @@ namespace UG3Interface
 
     class UG3InterfaceCanvas;
 
+    class AcqMode;
+
     class ActivityDataContainer
     {
     public:
@@ -107,6 +109,8 @@ namespace UG3Interface
         std::vector<Component*> getInputCanvasComponents();
 
         
+        void setCurrentMode(AcqMode* mode);
+        
         void bindInputActionComponentsToEditor(UG3InterfaceEditor* editor);
         void bindInputActionComponentsToCanvas(UG3InterfaceCanvas* canvas);
 
@@ -130,6 +134,9 @@ namespace UG3Interface
         bool connected = false;
 
         ScopedPointer<UG3Input> input;
+        
+        
+        AcqMode* currentMode;
         
         std::unique_ptr<ActivityDataContainer> activityDataContainer;
         

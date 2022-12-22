@@ -31,6 +31,16 @@ namespace UG3Interface {
 
 class UG3GridDisplay;
 
+struct AcqMode {
+    AcqMode(int sampleRate = 0, int maxChannels = 0) : sampleRate(sampleRate), maxChannels(maxChannels){}
+    int sampleRate;
+    int maxChannels;
+    String toString(){
+        return String(sampleRate) + String(" Hz/") + String(maxChannels) + String(" Channels");
+    }
+};
+
+
 class UG3InterfaceCanvas : public Visualizer,
     public Label::Listener,
     public ComboBox::Listener
@@ -91,6 +101,9 @@ private:
 
     std::unique_ptr<class UG3InterfaceViewport> viewport;
     std::unique_ptr<UG3GridDisplay> gridDisplay;
+    
+    ScopedPointer<ComboBox> modeSelector;
+    OwnedArray<AcqMode>acqModes;
     
     int numChannels;
     unsigned long long inputMaxValue;

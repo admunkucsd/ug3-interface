@@ -54,6 +54,8 @@ public:
     
     void updateChannelCountLabels();
     
+    void changeMaxSelectedChannels(int newMaxChannels);
+    
     std::set<int> getSelectedElectrodeIndexes(){return selectedElectrodeIndexes;}
     
     class DisplayMouseListener : public Component {

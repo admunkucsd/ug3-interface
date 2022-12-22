@@ -152,11 +152,17 @@ void UG3GridDisplay::updateChannelCountLabels(){
     }
     int labelIndex = 0;
     for(int count : counts) {
-        std::cout << "count" <<labelIndex << ": " << count << std::endl;
         channelCountLabels[labelIndex] -> setText(String(count)+String("/")+String(maxSelectedChannels/numSections),dontSendNotification);
         labelIndex += 1;
     }
 }
+
+void UG3GridDisplay::changeMaxSelectedChannels(int newMaxChannels){
+    maxSelectedChannels=newMaxChannels;
+    updateChannelCountLabels();
+    repaint();
+}
+
 
 UG3GridDisplay::DisplayMouseListener::DisplayMouseListener(UG3GridDisplay* display, int numRows, int numSections) : display(display), numRows(numRows), numSections(numSections) {}
 

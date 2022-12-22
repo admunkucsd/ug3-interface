@@ -366,6 +366,10 @@ void UG3InterfaceNode::changeInput(int index) {
 
 }
 
+void UG3InterfaceNode::setCurrentMode(AcqMode* mode){
+    currentMode = mode;
+}
+
 std::vector<Component*> UG3InterfaceNode::getInputEditorComponents() {
     return input->getEditorComponents();
 }

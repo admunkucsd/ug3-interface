@@ -60,6 +60,24 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, UG3InterfaceEdi
     }
     
     addAndMakeVisible (viewport.get());
+    
+    acqModes.add(new AcqMode(2000, 4096));
+    acqModes.add(new AcqMode(4000, 2048));
+    acqModes.add(new AcqMode(8000, 1024));
+    acqModes.add(new AcqMode(16000, 512));
+    node -> setCurrentMode(acqModes[0]);
+    modeSelector = new ComboBox ("Mode Selector");
+
+    int i = 0;
+    for (auto mode : acqModes)
+    {
+        modeSelector->addItem(mode->toString(), i + 1);
+        i++;
+    }
+    modeSelector->setSelectedId (1, dontSendNotification);
+    addAndMakeVisible(modeSelector);
+    modeSelector->addListener(this);
+
 
     update();
 
@@ -84,7 +102,13 @@ void UG3InterfaceCanvas::labelTextChanged(Label* label)
 }
 
 void UG3InterfaceCanvas::comboBoxChanged (ComboBox* combo){
-    node->onInputComboBoxChanged(combo);
+    if(combo == modeSelector){
+        node->setCurrentMode(acqModes[combo->getSelectedItemIndex()]);
+        gridDisplay->changeMaxSelectedChannels(acqModes[combo->getSelectedItemIndex()] -> maxChannels);
+    }
+    else {
+        node->onInputComboBoxChanged(combo);
+    }
 }
 
 
@@ -122,7 +146,10 @@ void UG3InterfaceCanvas::resized()
 {
     int componentsEndX = 10;
     viewport->setBounds(0, 0, getWidth(), getHeight()-30); // leave space at bottom for buttons
-
+    
+    modeSelector->setBounds(componentsEndX, getHeight() - 25, 160, 20);
+    componentsEndX += modeSelector ->getWidth() + 10;
+    
     gridDisplay->setBounds(0,0, std::max(gridDisplay->getTotalHeight(), getWidth() - scrollBarThickness), std::max(gridDisplay->getTotalHeight(), getHeight() - 30));
     node->resizeCanvasComponents(componentsEndX, getHeight());
 
