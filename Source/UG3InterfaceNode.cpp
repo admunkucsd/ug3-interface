@@ -109,7 +109,6 @@ UG3InterfaceNode::UG3InterfaceNode(SourceNode* sn) : DataThread(sn),
     lastTimerCallback(0),
     num_sections(DEFAULT_NUM_SECTIONS)
 {
-    //FIXME: Use editor ComboBox to determine input
     //input = new UG3Socket(false, 0,0);
     input = new UG3SimulatedInput(connected, num_channels_x, num_channels_y, num_samp, getInputMaxValue());
     connected = input->connect();
@@ -281,7 +280,6 @@ bool UG3InterfaceNode::updateBuffer()
     bool result = input -> loadBuffer((void*)recvbuf, num_channels*num_samp*2);
     if(!result)
         return false;
-    //FIXME: Add back offset/scale
     int k = 0;
     for (int i = 0; i < num_samp; i++) {
         for (int j = 0; j < num_channels; j++) {

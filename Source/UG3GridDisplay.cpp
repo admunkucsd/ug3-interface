@@ -52,6 +52,16 @@ UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, i
             addAndMakeVisible(newLabel);
             channelCountLabels.add(newLabel);
         }
+        
+        if(column % (numChannelsX/numSections) == (numChannelsX/numSections)*3/4 && row == 0){
+            int index = column /(numChannelsX/numSections);
+            Label* newLabel = new Label(String("Channels Remaining ") + String(index), String(maxSelectedChannels/numSections));
+            newLabel->setFont(Font("Small Text", 16, Font::plain));
+            newLabel->setColour(Label::textColourId, Colours::green);
+            newLabel->setBounds(L, TOP_BOUND/4, 65, TOP_BOUND * 3/4);
+            addAndMakeVisible(newLabel);
+            channelsRemainingLabels.add(newLabel);
+        }
             
 
         if(column == 0)
@@ -121,7 +131,7 @@ void UG3GridDisplay::updateSelectedElectrodes (std::set<int>& newValues, bool is
         }
         selectedElectrodeIndexes.insert(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end());
         highlightedElectrodeIndexes.clear();
-        updateChannelCountLabels();
+        updateChannelCountLabels(true);
         canvas->setNodeNumChannels(selectedElectrodeIndexes);
     }
     else {
@@ -140,26 +150,51 @@ void UG3GridDisplay::updateSelectedElectrodes (std::set<int>& newValues, bool is
                 electrodes[index] -> setColour(highlightedColor);
         }
         highlightedElectrodeIndexes = newValues;
+        updateChannelCountLabels(false);
     }
 
 }
 
 
-void UG3GridDisplay::updateChannelCountLabels(){
-    std::vector<int> counts(numSections, 0);
-    for(int index: selectedElectrodeIndexes) {
-        counts[(index % numChannelsX)/(numChannelsX/numSections)] += 1;
+void UG3GridDisplay::updateChannelCountLabels(bool isFinalSelection){
+    if(isFinalSelection) {
+        std::vector<int> counts(numSections, 0);
+        for(int index: selectedElectrodeIndexes) {
+            counts[(index % numChannelsX)/(numChannelsX/numSections)] += 1;
+        }
+        int labelIndex = 0;
+        for(int count : counts) {
+            channelCountLabels[labelIndex] -> setText(String(count)+String("/")+String(maxSelectedChannels/numSections),dontSendNotification);
+            labelIndex += 1;
+        }
     }
-    int labelIndex = 0;
-    for(int count : counts) {
-        channelCountLabels[labelIndex] -> setText(String(count)+String("/")+String(maxSelectedChannels/numSections),dontSendNotification);
-        labelIndex += 1;
+    else {
+        std::vector<int> counts(numSections, 0);
+        std::set<int> totalSelected;
+        std::merge(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), std::inserter(totalSelected, totalSelected.begin()));
+        for(int index: totalSelected) {
+            counts[(index % numChannelsX)/(numChannelsX/numSections)] += 1;
+        }
+        int labelIndex = 0;
+        for(int count : counts) {
+            int remaining = maxSelectedChannels/numSections - count;
+            channelsRemainingLabels[labelIndex] -> setText(String(remaining),dontSendNotification);
+            if (remaining < 0) {
+                channelsRemainingLabels[labelIndex] ->setColour(Label::textColourId, Colours::red);
+            }
+            else {
+                channelsRemainingLabels[labelIndex] ->setColour(Label::textColourId, Colours::green);
+            }
+            labelIndex += 1;
+        }
     }
 }
 
 void UG3GridDisplay::changeMaxSelectedChannels(int newMaxChannels){
     maxSelectedChannels=newMaxChannels;
-    updateChannelCountLabels();
+    //FIXME: improve method to allow for both sets of labels to be updated
+    updateChannelCountLabels(true);
+    updateChannelCountLabels(false);
     repaint();
 }
 

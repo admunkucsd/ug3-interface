@@ -52,7 +52,7 @@ public:
     
     void updateSelectedElectrodes (std::set<int>& newValues, bool isFilled = false);
     
-    void updateChannelCountLabels();
+    void updateChannelCountLabels(bool isFinalSelection);
     
     void changeMaxSelectedChannels(int newMaxChannels);
     
@@ -105,6 +105,7 @@ private:
     Colour highlightedColor;
     
     OwnedArray<Label> channelCountLabels;
+    OwnedArray<Label> channelsRemainingLabels;
     
     int totalHeight;
 
