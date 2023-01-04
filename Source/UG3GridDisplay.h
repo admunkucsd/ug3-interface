@@ -58,6 +58,8 @@ public:
     
     std::set<int> getSelectedElectrodeIndexes(){return selectedElectrodeIndexes;}
     
+    void setDeselectState(bool isDeselectActive);
+    
     class DisplayMouseListener : public Component {
     public:
         DisplayMouseListener(UG3GridDisplay* display, int numRows, int numSections);
@@ -101,6 +103,8 @@ private:
     std::set<int> highlightedElectrodeIndexes;
     std::set<int> selectedElectrodeIndexes;
     
+    const float highlightedAlpha = float(0.7);
+    
     Colour selectedColor;
     Colour highlightedColor;
     
@@ -108,6 +112,7 @@ private:
     OwnedArray<Label> channelsRemainingLabels;
     
     int totalHeight;
+    bool isDeselectActive;
 
     
 };

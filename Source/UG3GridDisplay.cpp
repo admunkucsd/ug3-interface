@@ -26,11 +26,11 @@ Colour Electrode::getColour() {
     return c;
 }
 
-UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannelsX, int numChannelsY, int numSections, int maxSelectedChannels) : canvas(canvas), viewport(viewport), numChannelsX(numChannelsX), numChannelsY(numChannelsY), numSections(numSections), totalHeight(0), maxSelectedChannels(maxSelectedChannels){
+UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, int numChannelsX, int numChannelsY, int numSections, int maxSelectedChannels) : canvas(canvas), viewport(viewport), numChannelsX(numChannelsX), numChannelsY(numChannelsY), numSections(numSections), totalHeight(0), maxSelectedChannels(maxSelectedChannels), isDeselectActive(false){
     int newTotalHeight = 0;
     const int totalPixels = numChannelsX * numChannelsY;
     selectedColor = ColourScheme::getColourForNormalizedValue(.9);
-    highlightedColor = selectedColor.withAlpha(float(0.7));
+    highlightedColor = selectedColor.withAlpha(highlightedAlpha);
         
     newTotalHeight = TOP_BOUND;
     
@@ -127,9 +127,21 @@ void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue)
 void UG3GridDisplay::updateSelectedElectrodes (std::set<int>& newValues, bool isFilled) {
     if(isFilled) {
         for(int index : newValues) {
-            electrodes[index] -> setColour(selectedColor);
+            if(isDeselectActive) {
+                electrodes[index] -> setColour(Colours::grey);
+            }
+            else {
+                electrodes[index] -> setColour(selectedColor);
+            }
         }
-        selectedElectrodeIndexes.insert(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end());
+        if(isDeselectActive) {
+            std::set<int> diff;
+            std::set_difference(selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), std::inserter(diff, diff.end()));
+            selectedElectrodeIndexes = diff;
+        }
+        else {
+            selectedElectrodeIndexes.insert(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end());
+        }
         highlightedElectrodeIndexes.clear();
         updateChannelCountLabels(true);
         canvas->setNodeNumChannels(selectedElectrodeIndexes);
@@ -171,7 +183,12 @@ void UG3GridDisplay::updateChannelCountLabels(bool isFinalSelection){
     else {
         std::vector<int> counts(numSections, 0);
         std::set<int> totalSelected;
-        std::merge(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), std::inserter(totalSelected, totalSelected.begin()));
+        if(isDeselectActive) {
+            std::set_difference(selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), std::inserter(totalSelected, totalSelected.end()));
+        }
+        else {
+            std::merge(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), std::inserter(totalSelected, totalSelected.begin()));
+        }
         for(int index: totalSelected) {
             counts[(index % numChannelsX)/(numChannelsX/numSections)] += 1;
         }
@@ -198,6 +215,9 @@ void UG3GridDisplay::changeMaxSelectedChannels(int newMaxChannels){
     repaint();
 }
 
+void UG3GridDisplay::setDeselectState(bool isDeselectActive){
+    this->isDeselectActive = isDeselectActive;
+}
 
 UG3GridDisplay::DisplayMouseListener::DisplayMouseListener(UG3GridDisplay* display, int numRows, int numSections) : display(display), numRows(numRows), numSections(numSections) {}
 

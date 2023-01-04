@@ -43,7 +43,8 @@ struct AcqMode {
 
 class UG3InterfaceCanvas : public Visualizer,
     public Label::Listener,
-    public ComboBox::Listener
+    public ComboBox::Listener,
+    public Button::Listener
 {
 public:
 
@@ -78,6 +79,9 @@ public:
     /** ComboBox::Listener callback*/
     void comboBoxChanged (ComboBox* combo);
     
+    /** Button::Listener callback*/
+    void buttonClicked (Button* button);
+    
     void addInputComponents();
     void removeInputComponents();
     void setNodeNumChannels(std::set<int> indexes);
@@ -103,6 +107,7 @@ private:
     std::unique_ptr<UG3GridDisplay> gridDisplay;
     
     ScopedPointer<ComboBox> modeSelector;
+    ScopedPointer<UtilityButton> deselectButton;
     OwnedArray<AcqMode>acqModes;
     
     int numChannels;

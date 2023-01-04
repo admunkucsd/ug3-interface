@@ -78,6 +78,14 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, UG3InterfaceEdi
     addAndMakeVisible(modeSelector);
     modeSelector->addListener(this);
 
+    deselectButton = new UtilityButton("Deselect", Font("Default", "Plain", 15));
+    deselectButton->setRadius(5.0f);
+    deselectButton->setEnabledState(true);
+    deselectButton->setCorners(true, true, true, true);
+    deselectButton->addListener(this);
+    deselectButton->setClickingTogglesState(true);
+    deselectButton->setToggleState(false, sendNotification);
+    addAndMakeVisible(deselectButton);
 
     update();
 
@@ -111,7 +119,11 @@ void UG3InterfaceCanvas::comboBoxChanged (ComboBox* combo){
     }
 }
 
-
+void UG3InterfaceCanvas::buttonClicked (Button* button){
+    if(button == deselectButton) {
+        gridDisplay->setDeselectState(button->getToggleState());
+    }
+}
 
 void UG3InterfaceCanvas::refresh()
 {
@@ -149,6 +161,8 @@ void UG3InterfaceCanvas::resized()
     
     modeSelector->setBounds(componentsEndX, getHeight() - 25, 160, 20);
     componentsEndX += modeSelector ->getWidth() + 10;
+    deselectButton->setBounds(componentsEndX, getHeight() - 25, 80, 20);
+    componentsEndX += deselectButton -> getWidth() + 10;
     
     gridDisplay->setBounds(0,0, std::max(gridDisplay->getTotalHeight(), getWidth() - scrollBarThickness), std::max(gridDisplay->getTotalHeight(), getHeight() - 30));
     node->resizeCanvasComponents(componentsEndX, getHeight());

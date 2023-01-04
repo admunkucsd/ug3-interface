@@ -245,6 +245,9 @@ bool UG3InterfaceNode::foundInputSource()
 bool UG3InterfaceNode::startAcquisition()
 {
     //resizeChanSamp();
+//    
+//    AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "Channels Selected Exceeds Mode Setting", "Cannot Start Acquistion because sections have too many channels selected;\n Please update your selection");
+//    return false;
 
     total_samples = 0;
 
