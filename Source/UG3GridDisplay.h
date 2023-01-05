@@ -55,7 +55,9 @@ public:
     
     int getTotalHeight() {return totalHeight;}
     
-    void updateSelectedElectrodes (std::set<int>& newValues, bool isFilled = false);
+    void updateHighlightedElectrodes(std::set<int>& newValues);
+    
+    void updateSelectedElectrodes (std::set<int>& newValues);
     
     void updateChannelCountLabels(bool isFinalSelection);
     

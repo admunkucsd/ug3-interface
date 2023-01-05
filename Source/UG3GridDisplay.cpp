@@ -130,16 +130,17 @@ std::set<int> UG3GridDisplay::everyOther() {
 
 void UG3GridDisplay::selectPreconfig(int configIndex, bool isFilled){
     std::set<int> newSelection;
-    updateSelectedElectrodes(newSelection);
+    updateHighlightedElectrodes(newSelection);
     String config = "";
     if(configIndex >= 0)
         config = preconfigOptions[configIndex];
     if(config == "Every Other") {
         newSelection = everyOther();
-        updateSelectedElectrodes(newSelection);
-//FIXME: need to refactor 2 purpose functions
         if(isFilled)
-            updateSelectedElectrodes(newSelection, true);
+            updateSelectedElectrodes(newSelection);
+        else
+            updateHighlightedElectrodes(newSelection);
+
     }
     repaint();
 }
@@ -156,94 +157,106 @@ void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue)
     
 }
 
-void UG3GridDisplay::updateSelectedElectrodes (std::set<int>& newValues, bool isFilled) {
-    if(isFilled) {
-        for(int index : newValues) {
-            if(isDeselectActive) {
-                electrodes[index] -> setColour(Colours::grey);
-            }
-            else {
-                electrodes[index] -> setColour(selectedColor);
-            }
-        }
+void UG3GridDisplay::updateHighlightedElectrodes (std::set<int>& newValues) {
+    std::set<int> diff;
+    std::set_difference(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), newValues.begin(), newValues.end(), std::inserter(diff, diff.end()));
+    for(int index : diff) {
+        if(electrodes[index] -> getColour() == highlightedColor)
+            electrodes[index] -> setColour(Colours::grey);
+    }
+    diff.clear();
+    
+    std::set_difference(newValues.begin(), newValues.end(), highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), std::inserter(diff, diff.end()));
+    
+    for(int index : diff) {
+        if(electrodes[index] -> getColour() == Colours::grey)
+            electrodes[index] -> setColour(highlightedColor);
+    }
+    highlightedElectrodeIndexes = newValues;
+    updateChannelCountLabels(false);
+}
+
+
+void UG3GridDisplay::updateSelectedElectrodes (std::set<int>& newValues) {
+    for(int index : newValues) {
         if(isDeselectActive) {
-            std::set<int> diff;
-            std::set_difference(selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), std::inserter(diff, diff.end()));
-            selectedElectrodeIndexes = diff;
+            electrodes[index] -> setColour(Colours::grey);
         }
         else {
-            selectedElectrodeIndexes.insert(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end());
+            electrodes[index] -> setColour(selectedColor);
         }
-        highlightedElectrodeIndexes.clear();
-        updateChannelCountLabels(true);
-        canvas->setNodeNumChannels(selectedElectrodeIndexes);
+    }
+    if(isDeselectActive) {
+        std::set<int> diff;
+        std::set_difference(selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), newValues.begin(), newValues.end(), std::inserter(diff, diff.end()));
+        selectedElectrodeIndexes = diff;
     }
     else {
-        std::set<int> diff;
-        std::set_difference(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), newValues.begin(), newValues.end(), std::inserter(diff, diff.end()));
-        for(int index : diff) {
-            if(electrodes[index] -> getColour() == highlightedColor)
-                electrodes[index] -> setColour(Colours::grey);
-        }
-        diff.clear();
-        
-        std::set_difference(newValues.begin(), newValues.end(), highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), std::inserter(diff, diff.end()));
-        
-        for(int index : diff) {
-            if(electrodes[index] -> getColour() == Colours::grey)
-                electrodes[index] -> setColour(highlightedColor);
-        }
-        highlightedElectrodeIndexes = newValues;
-        updateChannelCountLabels(false);
+        selectedElectrodeIndexes.insert(newValues.begin(), newValues.end());
     }
+    highlightedElectrodeIndexes.clear();
+    updateChannelCountLabels(true);
+    canvas->setNodeNumChannels(selectedElectrodeIndexes);
 
 }
 
 
 void UG3GridDisplay::updateChannelCountLabels(bool isFinalSelection){
+    
+    std::vector<int> counts(numSections, 0);
+    
+    //If the labels are being changed after a selection (not highlighting),
+    //then use the selectedElectrodeIndexes container to calculate counts
     if(isFinalSelection) {
-        std::vector<int> counts(numSections, 0);
         for(int index: selectedElectrodeIndexes) {
             counts[(index % numChannelsX)/(numChannelsX/numSections)] += 1;
         }
+    }
+    else {
+        std::set<int> totalSelectedandHighlighted;
+        //If there is a highlighted region with deselected enabled then
+        //take the difference of the selectedElectrodesIndexes and highlightedElectrodedIndexes
+        //to calculate counts
+        if(isDeselectActive) {
+            std::set_difference(selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), std::inserter(totalSelectedandHighlighted, totalSelectedandHighlighted.end()));
+        }
+        //If there is a highlighted region with electrodes to be added then take the combination of
+        //selectedElectrodesIndexes and highlihgtedElectrodeIndexes to calculate counts
+        else {
+            std::merge(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), std::inserter(totalSelectedandHighlighted, totalSelectedandHighlighted.begin()));
+        }
+        for(int index: totalSelectedandHighlighted) {
+            counts[(index % numChannelsX)/(numChannelsX/numSections)] += 1;
+        }
+    }
+    
+    //If a selection was made then update the channelCount labels
+    if(isFinalSelection) {
         int labelIndex = 0;
         for(int count : counts) {
             channelCountLabels[labelIndex] -> setText(String(count)+String("/")+String(maxSelectedChannels/numSections),dontSendNotification);
             labelIndex += 1;
         }
     }
-    else {
-        std::vector<int> counts(numSections, 0);
-        std::set<int> totalSelected;
-        if(isDeselectActive) {
-            std::set_difference(selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), std::inserter(totalSelected, totalSelected.end()));
+    
+    //Update the channelsRemainingLabels
+    int labelIndex = 0;
+    for(int count : counts) {
+        int remaining = maxSelectedChannels/numSections - count;
+        channelsRemainingLabels[labelIndex] -> setText(String(remaining),dontSendNotification);
+        if (remaining < 0) {
+            channelsRemainingLabels[labelIndex] ->setColour(Label::textColourId, Colours::red);
         }
         else {
-            std::merge(highlightedElectrodeIndexes.begin(), highlightedElectrodeIndexes.end(), selectedElectrodeIndexes.begin(), selectedElectrodeIndexes.end(), std::inserter(totalSelected, totalSelected.begin()));
+            channelsRemainingLabels[labelIndex] ->setColour(Label::textColourId, Colours::green);
         }
-        for(int index: totalSelected) {
-            counts[(index % numChannelsX)/(numChannelsX/numSections)] += 1;
-        }
-        int labelIndex = 0;
-        for(int count : counts) {
-            int remaining = maxSelectedChannels/numSections - count;
-            channelsRemainingLabels[labelIndex] -> setText(String(remaining),dontSendNotification);
-            if (remaining < 0) {
-                channelsRemainingLabels[labelIndex] ->setColour(Label::textColourId, Colours::red);
-            }
-            else {
-                channelsRemainingLabels[labelIndex] ->setColour(Label::textColourId, Colours::green);
-            }
-            labelIndex += 1;
-        }
+        labelIndex += 1;
     }
 }
 
 void UG3GridDisplay::changeMaxSelectedChannels(int newMaxChannels){
     maxSelectedChannels=newMaxChannels;
-    //FIXME: improve method to allow for both sets of labels to be updated
     updateChannelCountLabels(true);
-    updateChannelCountLabels(false);
     repaint();
 }
 
@@ -291,8 +304,10 @@ void UG3GridDisplay::DisplayMouseListener::calculateElectrodesSelected(bool isFi
             electrodeIndexes.insert(nearestLeftEdge + j + ((nearestTopEdge + i)*numRows));
         }
     }
-    
-    display -> updateSelectedElectrodes(electrodeIndexes, isFilled);
+    if(isFilled)
+        display -> updateSelectedElectrodes(electrodeIndexes);
+    else
+        display -> updateHighlightedElectrodes(electrodeIndexes);
     
 }
 
