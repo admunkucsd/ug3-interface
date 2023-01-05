@@ -50,6 +50,7 @@ public:
     std::vector<String> getPreconfigOptions(){return preconfigOptions;};
     
     std::set<int> everyOther();
+    std::set<int> diagonal();
     
     void selectPreconfig(int configIndex, bool isFilled);
     

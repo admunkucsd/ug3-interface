@@ -91,6 +91,7 @@ UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, i
     totalHeight = newTotalHeight + TOP_BOUND - SPACING;
 
     preconfigOptions.push_back("Every Other");
+    preconfigOptions.push_back("Diagonal");
     
 }
 
@@ -118,7 +119,6 @@ std::set<int> UG3GridDisplay::everyOther() {
     std::set<int> returnSet;
     for(int y = 0; y < numChannelsY; y++) {
         for(int x = 0; x < numChannelsX; x++) {
-            //std::cout << maxSelectedChannels << " " << numChannelsX <<std::endl;
             int result = (maxSelectedChannels/numChannelsX);
             if(x % ((numChannelsX*numChannelsY)/maxSelectedChannels) == 0){
                 returnSet.insert(x+y*numChannelsX);
@@ -127,6 +127,23 @@ std::set<int> UG3GridDisplay::everyOther() {
     }
     return returnSet;
 }
+
+std::set<int> UG3GridDisplay::diagonal() {
+    std::set<int> returnSet;
+    int offset = 0;
+    for(int y = 0; y < numChannelsY; y++) {
+        for(int x = 0; x < numChannelsX; x++) {
+            int result = (maxSelectedChannels/numChannelsX);
+            if((x + offset) % ((numChannelsX*numChannelsY)/maxSelectedChannels) == 0){
+                returnSet.insert(x+y*numChannelsX);
+            }
+        }
+        offset = (offset + 1) % ((numChannelsX*numChannelsY)/maxSelectedChannels);
+    }
+    return returnSet;
+}
+
+
 
 void UG3GridDisplay::selectPreconfig(int configIndex, bool isFilled){
     std::set<int> newSelection;
@@ -141,6 +158,13 @@ void UG3GridDisplay::selectPreconfig(int configIndex, bool isFilled){
         else
             updateHighlightedElectrodes(newSelection);
 
+    }
+    else if (config == "Diagonal") {
+        newSelection = diagonal();
+        if(isFilled)
+            updateSelectedElectrodes(newSelection);
+        else
+            updateHighlightedElectrodes(newSelection);
     }
     repaint();
 }

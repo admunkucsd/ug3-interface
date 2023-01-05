@@ -131,6 +131,8 @@ void UG3InterfaceCanvas::comboBoxChanged (ComboBox* combo){
     if(combo == modeSelector){
         node->setCurrentMode(acqModes[combo->getSelectedItemIndex()]);
         gridDisplay->changeMaxSelectedChannels(acqModes[combo->getSelectedItemIndex()] -> maxChannels);
+        gridDisplay->selectPreconfig(channelPreconfigSelector->getSelectedItemIndex() - 1, false);
+
     }
     else if(combo == channelPreconfigSelector) {
         gridDisplay->selectPreconfig(combo->getSelectedItemIndex() - 1, false);
@@ -146,6 +148,7 @@ void UG3InterfaceCanvas::buttonClicked (Button* button){
     }
     else if (button == applyButton) {
         gridDisplay->selectPreconfig(channelPreconfigSelector->getSelectedItemIndex() - 1, true);
+        channelPreconfigSelector->setSelectedId (1, dontSendNotification);
     }
 }
 
