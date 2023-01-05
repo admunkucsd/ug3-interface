@@ -47,6 +47,11 @@ public:
     
     void paint(Graphics& g);
     
+    std::vector<String> getPreconfigOptions(){return preconfigOptions;};
+    
+    std::set<int> everyOther();
+    
+    void selectPreconfig(int configIndex, bool isFilled);
     
     int getTotalHeight() {return totalHeight;}
     
@@ -102,6 +107,8 @@ private:
     ScopedPointer<DisplayMouseListener> mouseListener;
     std::set<int> highlightedElectrodeIndexes;
     std::set<int> selectedElectrodeIndexes;
+    
+    std::vector<String> preconfigOptions;
     
     const float highlightedAlpha = float(0.7);
     

@@ -90,6 +90,7 @@ UG3GridDisplay::UG3GridDisplay(UG3InterfaceCanvas* canvas, Viewport* viewport, i
         
     totalHeight = newTotalHeight + TOP_BOUND - SPACING;
 
+    preconfigOptions.push_back("Every Other");
     
 }
 
@@ -112,6 +113,37 @@ void UG3GridDisplay::paint(Graphics& g){
     }
     
 }
+
+std::set<int> UG3GridDisplay::everyOther() {
+    std::set<int> returnSet;
+    for(int y = 0; y < numChannelsY; y++) {
+        for(int x = 0; x < numChannelsX; x++) {
+            //std::cout << maxSelectedChannels << " " << numChannelsX <<std::endl;
+            int result = (maxSelectedChannels/numChannelsX);
+            if(x % ((numChannelsX*numChannelsY)/maxSelectedChannels) == 0){
+                returnSet.insert(x+y*numChannelsX);
+            }
+        }
+    }
+    return returnSet;
+}
+
+void UG3GridDisplay::selectPreconfig(int configIndex, bool isFilled){
+    std::set<int> newSelection;
+    updateSelectedElectrodes(newSelection);
+    String config = "";
+    if(configIndex >= 0)
+        config = preconfigOptions[configIndex];
+    if(config == "Every Other") {
+        newSelection = everyOther();
+        updateSelectedElectrodes(newSelection);
+//FIXME: need to refactor 2 purpose functions
+        if(isFilled)
+            updateSelectedElectrodes(newSelection, true);
+    }
+    repaint();
+}
+
 
 void UG3GridDisplay::refresh(const float * peakToPeakValues, int const maxValue) {
     

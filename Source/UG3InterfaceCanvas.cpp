@@ -85,8 +85,26 @@ UG3InterfaceCanvas::UG3InterfaceCanvas(UG3InterfaceNode * node_, UG3InterfaceEdi
     deselectButton->addListener(this);
     deselectButton->setClickingTogglesState(true);
     deselectButton->setToggleState(false, sendNotification);
-    addAndMakeVisible(deselectButton);
+    addAndMakeVisible(deselectButton);    
 
+    channelPreconfigSelector = new ComboBox("Preconfig Selector");
+    channelPreconfigSelector -> addItem("Channel Options", 1);
+    channelPreconfigSelector->setSelectedId (1, dontSendNotification);
+    i = 1;
+    for (auto option : gridDisplay -> getPreconfigOptions()) {
+        channelPreconfigSelector->addItem(option, i+1);
+        i++;
+    }
+    addAndMakeVisible(channelPreconfigSelector);
+    channelPreconfigSelector->addListener(this);
+    
+    applyButton = new UtilityButton("Apply", Font("Default", "Plain", 15));
+    applyButton->setRadius(5.0f);
+    applyButton->setEnabledState(true);
+    applyButton->setCorners(true, true, true, true);
+    applyButton->addListener(this);
+    addAndMakeVisible(applyButton);
+    
     update();
 
 }
@@ -114,6 +132,9 @@ void UG3InterfaceCanvas::comboBoxChanged (ComboBox* combo){
         node->setCurrentMode(acqModes[combo->getSelectedItemIndex()]);
         gridDisplay->changeMaxSelectedChannels(acqModes[combo->getSelectedItemIndex()] -> maxChannels);
     }
+    else if(combo == channelPreconfigSelector) {
+        gridDisplay->selectPreconfig(combo->getSelectedItemIndex() - 1, false);
+    }
     else {
         node->onInputComboBoxChanged(combo);
     }
@@ -122,6 +143,9 @@ void UG3InterfaceCanvas::comboBoxChanged (ComboBox* combo){
 void UG3InterfaceCanvas::buttonClicked (Button* button){
     if(button == deselectButton) {
         gridDisplay->setDeselectState(button->getToggleState());
+    }
+    else if (button == applyButton) {
+        gridDisplay->selectPreconfig(channelPreconfigSelector->getSelectedItemIndex() - 1, true);
     }
 }
 
@@ -163,6 +187,10 @@ void UG3InterfaceCanvas::resized()
     componentsEndX += modeSelector ->getWidth() + 10;
     deselectButton->setBounds(componentsEndX, getHeight() - 25, 80, 20);
     componentsEndX += deselectButton -> getWidth() + 10;
+    channelPreconfigSelector->setBounds(componentsEndX, getHeight() - 25, 160, 20);
+    componentsEndX += channelPreconfigSelector ->getWidth() + 10;
+    applyButton->setBounds(componentsEndX, getHeight() - 25, 80, 20);
+    componentsEndX += applyButton ->getWidth() + 10;
     
     gridDisplay->setBounds(0,0, std::max(gridDisplay->getTotalHeight(), getWidth() - scrollBarThickness), std::max(gridDisplay->getTotalHeight(), getHeight() - 30));
     node->resizeCanvasComponents(componentsEndX, getHeight());

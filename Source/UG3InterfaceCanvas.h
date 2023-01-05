@@ -107,8 +107,10 @@ private:
     std::unique_ptr<UG3GridDisplay> gridDisplay;
     
     ScopedPointer<ComboBox> modeSelector;
+    ScopedPointer<ComboBox> channelPreconfigSelector;
     ScopedPointer<UtilityButton> deselectButton;
-    OwnedArray<AcqMode>acqModes;
+    ScopedPointer<UtilityButton> applyButton;
+    OwnedArray<AcqMode> acqModes;
     
     int numChannels;
     unsigned long long inputMaxValue;
